@@ -20,8 +20,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.User
+import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.uiComponents.ClickableText
 import java.util.*
@@ -51,13 +54,13 @@ class RegisterActivity : ComponentActivity() {
 @Composable
 fun RegisterScreen() {
     val context = LocalContext.current
-    val nameState = rememberSaveable { mutableStateOf("") }
-    val fullnameState = rememberSaveable { mutableStateOf("") }
-    val emailState = rememberSaveable { mutableStateOf("") }
-    val dateOfBirthState = rememberSaveable { mutableStateOf("") }
-    val addressState = rememberSaveable { mutableStateOf("") }
-    val passwordState = rememberSaveable { mutableStateOf("") }
-    val confirmPasswordState = rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var fullname by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var dateOfBirth by rememberSaveable { mutableStateOf("") }
+    var address by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
 
@@ -69,21 +72,21 @@ fun RegisterScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         TextField(
-            value = nameState.value,
-            onValueChange = { nameState.value = it },
+            value = name,
+            onValueChange = { name = it },
             label = { Text(stringResource(R.string.register_name)) }
         )
 
         TextField(
-            value = fullnameState.value,
-            onValueChange = { fullnameState.value = it },
+            value = fullname,
+            onValueChange = { fullname = it },
             label = { Text(stringResource(R.string.register_fullname)) },
             modifier = Modifier.padding(top = 16.dp)
         )
 
         TextField(
-            value = emailState.value,
-            onValueChange = { emailState.value = it },
+            value = email,
+            onValueChange = { email = it },
             label = { Text(stringResource(R.string.register_email)) },
             modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -93,8 +96,8 @@ fun RegisterScreen() {
         )
 
         TextField(
-            value = dateOfBirthState.value,
-            onValueChange = { dateOfBirthState.value = it },
+            value = dateOfBirth,
+            onValueChange = { dateOfBirth = it },
             label = { Text(stringResource(R.string.register_date)) },
             modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -104,15 +107,15 @@ fun RegisterScreen() {
         )
 
         TextField(
-            value = addressState.value,
-            onValueChange = { addressState.value = it },
+            value = address,
+            onValueChange = { address = it },
             label = { Text(stringResource(R.string.register_address)) },
             modifier = Modifier.padding(top = 16.dp)
         )
 
         TextField(
-            value = passwordState.value,
-            onValueChange = { passwordState.value = it },
+            value = password,
+            onValueChange = { password = it },
             label = { Text(stringResource(R.string.register_password)) },
             modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -123,8 +126,8 @@ fun RegisterScreen() {
         )
 
         TextField(
-            value = confirmPasswordState.value,
-            onValueChange = { confirmPasswordState.value = it },
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
             label = { Text(stringResource(R.string.register_confirm_password)) },
             modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -138,22 +141,22 @@ fun RegisterScreen() {
             onClick = {
                 register(
                     context,
-                    nameState.value,
-                    fullnameState.value,
-                    emailState.value,
-                    dateOfBirthState.value,
-                    addressState.value,
-                    passwordState.value,
-                    confirmPasswordState.value
+                    name,
+                    fullname,
+                    email,
+                    dateOfBirth,
+                    address,
+                    password,
+                    confirmPassword
                 )
             },
-            enabled = nameState.value.isNotBlank()
-                    && fullnameState.value.isNotBlank()
-                    && emailState.value.isNotBlank()
-                    && dateOfBirthState.value.isNotBlank()
-                    && addressState.value.isNotBlank()
-                    && passwordState.value.isNotBlank()
-                    && confirmPasswordState.value.isNotBlank(),
+            enabled = name.isNotBlank()
+                    && fullname.isNotBlank()
+                    && email.isNotBlank()
+                    && dateOfBirth.isNotBlank()
+                    && address.isNotBlank()
+                    && password.isNotBlank()
+                    && confirmPassword.isNotBlank(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)

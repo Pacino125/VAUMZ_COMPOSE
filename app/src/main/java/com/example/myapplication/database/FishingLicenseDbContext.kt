@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.database
 
 import android.content.ContentValues
 import android.content.Context
@@ -11,8 +11,6 @@ import com.example.myapplication.data.AreaType
 import com.example.myapplication.data.Catch
 import com.example.myapplication.data.FishType
 import com.example.myapplication.data.FishingSession
-import com.example.myapplication.data.License
-import com.example.myapplication.data.LicenseType
 import com.example.myapplication.data.User
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime

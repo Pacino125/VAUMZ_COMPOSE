@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.Area
 import com.example.myapplication.data.FishingSession
 import com.example.myapplication.data.User
+import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.time.LocalDateTime
 import java.util.UUID
