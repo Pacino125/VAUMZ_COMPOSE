@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,7 +66,7 @@ class SelectAreaManuallyActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SelectAreaManuallyScreen(allAreas: List<Area>?, areasInUserOrganization: List<Area>?) {
-    val selectedAreaIndex = remember { mutableIntStateOf(-1) }
+    val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
 
     val scrollState = rememberScrollState()
 

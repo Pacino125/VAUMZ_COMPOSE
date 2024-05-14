@@ -21,7 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,13 +51,13 @@ class RegisterActivity : ComponentActivity() {
 @Composable
 fun RegisterScreen() {
     val context = LocalContext.current
-    val nameState = remember { mutableStateOf("") }
-    val fullnameState = remember { mutableStateOf("") }
-    val emailState = remember { mutableStateOf("") }
-    val dateOfBirthState = remember { mutableStateOf("") }
-    val addressState = remember { mutableStateOf("") }
-    val passwordState = remember { mutableStateOf("") }
-    val confirmPasswordState = remember { mutableStateOf("") }
+    val nameState = rememberSaveable { mutableStateOf("") }
+    val fullnameState = rememberSaveable { mutableStateOf("") }
+    val emailState = rememberSaveable { mutableStateOf("") }
+    val dateOfBirthState = rememberSaveable { mutableStateOf("") }
+    val addressState = rememberSaveable { mutableStateOf("") }
+    val passwordState = rememberSaveable { mutableStateOf("") }
+    val confirmPasswordState = rememberSaveable { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
 
