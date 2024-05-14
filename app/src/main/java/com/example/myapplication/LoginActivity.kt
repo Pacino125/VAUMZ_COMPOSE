@@ -24,13 +24,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.uiComponents.ClickableText
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LoginScreen()
+            MyApplicationTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    LoginScreen()
+                }
+            }
         }
     }
 }
