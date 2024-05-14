@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -57,8 +59,12 @@ fun RegisterScreen() {
     val passwordState = remember { mutableStateOf("") }
     val confirmPasswordState = remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .then(Modifier.verticalScroll(scrollState)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -176,19 +182,19 @@ private fun register(
     confirmPassword: String
 ) {
     if (!email.contains("@")) {
-        showError(context, "Email musí obsahovať @!")
+        showError(context, context.getString(R.string.error_email_at))
         return
     }
 
     val dbHelper = FishingLicenseDbContext(context)
     val existingUser = dbHelper.getUserByEmail(email)
     if (existingUser != null) {
-        showError(context, "Používateľ s týmto emailom už existuje!")
+        showError(context, context.getString(R.string.error_user_exists))
         return
     }
 
     if (password != confirmPassword) {
-        showError(context, "Heslá sa nezhodujú!")
+        showError(context, context.getString(R.string.error_different_passwords))
         return
     }
 

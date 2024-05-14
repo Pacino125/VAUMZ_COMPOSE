@@ -39,4 +39,7 @@
     <string name="license_length">Dĺžka</string>
     <string name="license_count">Počet</string>
     <string name="license_fish_type">Druh ryby</string>
+    <string name="error_email_at">Email musí obsahovať @!</string>
+    <string name="error_user_exists">Používateľ s týmto emailom už existuje!</string>
+    <string name="error_different_passwords">Heslá sa nezhodujú!</string>
 </resources>
