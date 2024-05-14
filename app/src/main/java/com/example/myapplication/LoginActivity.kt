@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -18,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
@@ -44,35 +47,37 @@ fun LoginScreen() {
             TextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
-                label = { Text("Email") }
+                label = { Text(stringResource(R.string.login_email)) }
             )
             TextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.login_password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.padding(top = 16.dp)
             )
             Button(
                 onClick = {
-                    // Perform login action
                     authenticate(context, emailState.value, passwordState.value)
                 },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Login")
+                Text(stringResource(R.string.login_login))
             }
         }
     }
 }
 
 fun authenticate(context: android.content.Context, email: String, password: String) {
-    // Perform authentication logic here
-    if (email == "example@example.com" && password == "password") {
-        // Successful authentication
-        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+    val dbContext = FishingLicenseDbContext(context)
+    val user = dbContext.getUserByEmail(email)
+    if (user != null && user.password == password) {
+        val intent = Intent(context, LicenseActivity::class.java)
+        intent.putExtra("USER_GUID", user.guid)
+        context.startActivity(intent)
+
+        (context as? Activity)?.finish()
     } else {
-        // Failed authentication
-        Toast.makeText(context, "Invalid email or password", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Nesprávny email alebo heslo", Toast.LENGTH_SHORT).show()
     }
 }
