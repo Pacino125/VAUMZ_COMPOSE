@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.uiComponents.ClickableText
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +44,8 @@ fun LoginScreen() {
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             TextField(
                 value = emailState.value,
@@ -64,6 +67,13 @@ fun LoginScreen() {
             ) {
                 Text(stringResource(R.string.login_login))
             }
+            ClickableText(
+                text = stringResource(R.string.login_registration),
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = {
+                    navigateToRegister(context)
+                }
+            )
         }
     }
 }
@@ -78,6 +88,12 @@ fun authenticate(context: android.content.Context, email: String, password: Stri
 
         (context as? Activity)?.finish()
     } else {
-        Toast.makeText(context, "Nesprávny email alebo heslo", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context,
+            context.getString(R.string.login_invalid_email_password), Toast.LENGTH_SHORT).show()
     }
+}
+
+fun navigateToRegister(context: android.content.Context) {
+    val intent = Intent(context, RegisterActivity::class.java)
+    context.startActivity(intent)
 }

@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Rybárske povolenky</string>
+    <string name="login_login">Prihlásiť sa</string>
+    <string name="login_password">Heslo</string>
+    <string name="login_email">Email</string>
+    <string name="license_my_license">Moja povolenka</string>
+    <string name="license_trout_waters">Pstruhové vody</string>
+    <string name="license_carp_waters">Kaprové vody</string>
+    <string name="license_big_trout_license">Povolenie na lov hlavátky</string>
+    <string name="license_state_license">Zväzové povolenie</string>
+    <string name="license_thyme_waters">Lipňové vody</string>
+    <string name="login_registration">Chcete sa zaregistrovať?</string>
+    <string name="login_invalid_email_password">Nesprávny email alebo heslo</string>
 </resources>
