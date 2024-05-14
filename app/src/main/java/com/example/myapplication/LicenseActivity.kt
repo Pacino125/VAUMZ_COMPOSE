@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.FishingSession
 import com.example.myapplication.data.User
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -59,17 +62,25 @@ class LicenseActivity : ComponentActivity() {
 @Composable
 fun LicenseScreen(fishingSessions: List<FishingSession>?, currentUser: User) {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 32.dp)
     ) {
-        Text(
-            text = stringResource(R.string.license_my_license),
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 16.dp)
-        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.license_my_license),
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
-        FishingSessionsSection(fishingSessions)
+            FishingSessionsSection(fishingSessions)
+        }
+
         ActionButtons(LocalContext.current, fishingSessions, currentUser)
     }
 }
@@ -78,31 +89,56 @@ fun LicenseScreen(fishingSessions: List<FishingSession>?, currentUser: User) {
 @Composable
 fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
     if (fishingSessions == null) return
+    val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .then(Modifier.verticalScroll(scrollState))
     ) {
-        Text(
-            text = "",
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
         Row(
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.license_date),
                 fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 text = stringResource(R.string.license_area_number),
                 fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
                 modifier = Modifier.weight(1f)
             )
             Text(
                 text = stringResource(R.string.license_area_name),
                 fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(R.string.license_fish_type),
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(R.string.license_count),
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(R.string.license_length),
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(R.string.license_weight),
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -115,14 +151,49 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
             ) {
                 Text(
                     text = session.date.format(DateTimeFormatter.ofPattern("dd.MM")),
+                    fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = session.areaId.areaId,
+                    fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = session.areaId.name,
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = session.catchId?.fishType?.type ?: "---",
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (session.catchId?.fishCount != null) {
+                        session.catchId.fishCount.toString()
+                    } else {
+                        "---"
+                    },
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (session.catchId?.length != null) {
+                        session.catchId.length.toString()
+                    } else {
+                        "---"
+                    },
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (session.catchId?.weight != null) {
+                        session.catchId.weight.toString()
+                    } else {
+                        "---"
+                    },
+                    fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -149,7 +220,7 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                     .padding(end = 8.dp)
                     .height(48.dp)
             ) {
-                Text(text = stringResource(R.string.licenses_add_fish))
+                Text(text = stringResource(R.string.license_add_fish))
             }
 
             if (fishingSessions != null && fishingSessions.any { it.isActive }) {
@@ -166,7 +237,7 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                         .padding(start = 8.dp)
                         .height(48.dp)
                 ) {
-                    Text(text = stringResource(R.string.licenses_end_fishing))
+                    Text(text = stringResource(R.string.license_end_fishing))
                 }
             } else {
                 Button(
@@ -179,7 +250,7 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                         .weight(1f)
                         .height(48.dp)
                 ) {
-                    Text(text = stringResource(R.string.licenses_start_fishing))
+                    Text(text = stringResource(R.string.license_start_fishing))
                 }
             }
         }

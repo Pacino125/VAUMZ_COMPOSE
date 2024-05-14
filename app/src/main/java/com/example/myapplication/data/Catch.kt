@@ -4,6 +4,6 @@ data class Catch (
     val guid: String,
     val fishType : FishType?,
     val fishCount : Int,
-    val length : Int,
+    val length : Int?,
     val weight : Double
 )

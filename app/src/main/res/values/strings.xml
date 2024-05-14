@@ -20,9 +20,9 @@
     <string name="register_confirm_password">Potvrdiť heslo</string>
     <string name="register_register_button">Registrovať</string>
     <string name="register_login">Späť na prihlásenie.</string>
-    <string name="licenses_add_fish">Privlastniť rybu</string>
-    <string name="licenses_end_fishing">Odpísať</string>
-    <string name="licenses_start_fishing">Zapísať</string>
+    <string name="license_add_fish">Privlastniť rybu</string>
+    <string name="license_end_fishing">Odpísať</string>
+    <string name="license_start_fishing">Zapísať</string>
     <string name="license_date">Dátum</string>
     <string name="license_area_number">Číslo revíru</string>
     <string name="license_area_name">Revír</string>
@@ -35,4 +35,8 @@
     <string name="select_area_area_chap">Chap</string>
     <string name="yes">Áno</string>
     <string name="no">Nie</string>
+    <string name="license_weight">Hmotnosť</string>
+    <string name="license_length">Dĺžka</string>
+    <string name="license_count">Počet</string>
+    <string name="license_fish_type">Druh ryby</string>
 </resources>
