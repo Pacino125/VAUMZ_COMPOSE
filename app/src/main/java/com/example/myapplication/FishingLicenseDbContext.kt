@@ -340,52 +340,6 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         return areas
     }
 
-    fun getLicensesByUserGuid (userGuid: String): List<License> {
-        val licenses = mutableListOf<License>()
-        val db = readableDatabase
-
-        val query = "SELECT tbl_license.guid, tbl_license.license_type_guid, tbl_license.user_guid, tbl_license.year, " +
-                "tbl_license_type.guid AS typeGuid, tbl_license_type.type, tbl_license_type.description, " +
-                "tbl_license_type.price_for_adult, tbl_license_type.price_for_child " +
-                "FROM tbl_license " +
-                "INNER JOIN tbl_license_type ON tbl_license.license_type_guid = tbl_license_type.guid " +
-                "WHERE tbl_license.user_guid = ?"
-
-        val cursor = db.rawQuery(query, arrayOf(userGuid))
-        while (cursor.moveToNext()) {
-            val guidIndex = cursor.getColumnIndex("guid")
-            val userIdIndex = cursor.getColumnIndex("user_guid")
-            val yearIndex = cursor.getColumnIndex("year")
-            val typeGuidIndex = cursor.getColumnIndex("typeGuid")
-            val typeIndex = cursor.getColumnIndex("type")
-            val descriptionIndex = cursor.getColumnIndex("description")
-            val priceForAdultIndex = cursor.getColumnIndex("price_for_adult")
-            val priceForChildIndex = cursor.getColumnIndex("price_for_child")
-
-            if (guidIndex != -1 && userIdIndex != -1 && yearIndex != -1 && typeGuidIndex != -1 &&
-                typeIndex != -1 && descriptionIndex != -1 && priceForAdultIndex != -1 && priceForChildIndex != -1) {
-
-                val guid = cursor.getString(guidIndex)
-                val userId = cursor.getString(userIdIndex)
-                val year = cursor.getInt(yearIndex)
-                val typeGuid = cursor.getString(typeGuidIndex)
-                val type = cursor.getString(typeIndex)
-                val description = cursor.getString(descriptionIndex)
-                val priceForAdult = cursor.getInt(priceForAdultIndex)
-                val priceForChild = cursor.getInt(priceForChildIndex)
-
-                val licenseType = LicenseType(typeGuid, type, description, priceForAdult, priceForChild)
-
-                val license = License(guid, licenseType, userId, year)
-                licenses.add(license)
-            }
-        }
-
-        cursor.close()
-        db.close()
-        return licenses
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun getFishingSessions(): List<FishingSession> {
         val fishingSessions = mutableListOf<FishingSession>()

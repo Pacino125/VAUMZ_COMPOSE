@@ -71,13 +71,15 @@ fun RegisterScreen() {
         TextField(
             value = fullnameState.value,
             onValueChange = { fullnameState.value = it },
-            label = { Text(stringResource(R.string.register_fullname)) }
+            label = { Text(stringResource(R.string.register_fullname)) },
+            modifier = Modifier.padding(top = 16.dp)
         )
 
         TextField(
             value = emailState.value,
             onValueChange = { emailState.value = it },
             label = { Text(stringResource(R.string.register_email)) },
+            modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -88,6 +90,7 @@ fun RegisterScreen() {
             value = dateOfBirthState.value,
             onValueChange = { dateOfBirthState.value = it },
             label = { Text(stringResource(R.string.register_date)) },
+            modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -97,13 +100,15 @@ fun RegisterScreen() {
         TextField(
             value = addressState.value,
             onValueChange = { addressState.value = it },
-            label = { Text(stringResource(R.string.register_address)) }
+            label = { Text(stringResource(R.string.register_address)) },
+            modifier = Modifier.padding(top = 16.dp)
         )
 
         TextField(
             value = passwordState.value,
             onValueChange = { passwordState.value = it },
             label = { Text(stringResource(R.string.register_password)) },
+            modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Next
@@ -115,6 +120,7 @@ fun RegisterScreen() {
             value = confirmPasswordState.value,
             onValueChange = { confirmPasswordState.value = it },
             label = { Text(stringResource(R.string.register_confirm_password)) },
+            modifier = Modifier.padding(top = 16.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
