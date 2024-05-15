@@ -487,6 +487,7 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         }
 
         db.update("tbl_fishing_session", sessionValues, "guid = ?", arrayOf(fishingSessionGuid))
+        updateFishingSessionIsActiveToFalse(fishingSessionGuid)
         db.close()
     }
 

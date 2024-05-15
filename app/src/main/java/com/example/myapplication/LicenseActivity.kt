@@ -166,33 +166,37 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = session.catchId?.fishType?.type ?: "---",
-                    fontSize = 12.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = if (session.catchId?.fishCount != null) {
-                        session.catchId.fishCount.toString()
+                    text = if (session.isActive) {
+                        ""
                     } else {
-                        "---"
+                        session.catchId?.fishType?.type ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = if (session.catchId?.length != null) {
-                        session.catchId.length.toString()
+                    text = if (session.isActive) {
+                        ""
                     } else {
-                        "---"
+                        session.catchId?.fishCount?.toString() ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = if (session.catchId?.weight != null) {
-                        session.catchId.weight.toString()
+                    text = if (session.isActive) {
+                        ""
                     } else {
-                        "---"
+                        session.catchId?.length?.toString() ?: "---"
+                    },
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (session.isActive) {
+                        ""
+                    } else {
+                        session.catchId?.weight?.toString() ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
