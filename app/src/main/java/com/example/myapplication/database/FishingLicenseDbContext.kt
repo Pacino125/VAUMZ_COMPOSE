@@ -346,7 +346,7 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
 
         val query = "SELECT fishingSession.guid, fishingSession.area_guid, fishingSession.date, fishingSession.is_active, " +
                 "catch.guid AS catch_guid, catch.fish_type_guid, catch.fish_count, catch.length, catch.weight, " +
-                "area.guid AS area_area_guid, area.name AS area_name, area.area_id, fishType.guid AS fish_type_guid, fishType.type AS fish_type_type " +
+                "area.guid AS area_area_guid, area.name AS area_name, area.area_id, area.chap, fishType.guid AS fish_type_guid, fishType.type AS fish_type_type " +
                 "FROM tbl_fishing_session fishingSession " +
                 "INNER JOIN tbl_area area ON fishingSession.area_guid = area.guid " +
                 "LEFT JOIN tbl_catch catch ON fishingSession.catch_guid = catch.guid " +
@@ -364,14 +364,15 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
             val areaGuidIndex = cursor.getColumnIndex("area_area_guid")
             val areaNameIndex = cursor.getColumnIndex("area_name")
             val areaIdIndex = cursor.getColumnIndex("area_id")
+            val areaChapIndex = cursor.getColumnIndex("chap")
             val fishTypeGuidIndex = cursor.getColumnIndex("fish_type_guid")
             val fishTypeTypeIndex = cursor.getColumnIndex("fish_type_type")
 
             if (sessionGuidIndex != -1  && dateIndex != -1 &&
                 isActiveIndex != -1 && catchGuidIndex != -1 &&
                 areaGuidIndex != -1 && areaNameIndex != -1 && areaIdIndex != -1 &&
-                fishTypeGuidIndex != -1 && fishTypeTypeIndex != -1 && weightIndex != -1 &&
-                fishCountIndex != -1 && lengthIndex != -1) {
+                areaChapIndex != -1 && fishTypeGuidIndex != -1 && fishTypeTypeIndex != -1 &&
+                weightIndex != -1 && fishCountIndex != -1 && lengthIndex != -1) {
 
                 val sessionGuid = cursor.getString(sessionGuidIndex)
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(cursor.getString(dateIndex))
@@ -384,9 +385,10 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
                 val areaGuid = cursor.getString(areaGuidIndex)
                 val areaName = cursor.getString(areaNameIndex)
                 val areaId = cursor.getString(areaIdIndex)
+                val areaChap = cursor.getInt(areaChapIndex) == 1
                 val fishTypeType = cursor.getString(fishTypeTypeIndex)
 
-                val area = Area(areaGuid, areaName, areaId, null, null, null, null)
+                val area = Area(areaGuid, areaName, areaId, null, null, null, areaChap)
                 val fishType = if (fishTypeGuid != null) FishType(fishTypeGuid, fishTypeType, null, null) else null
                 val catch = if (catchGuid != null) Catch(catchGuid, fishType, fishCount, length, weight) else null
 

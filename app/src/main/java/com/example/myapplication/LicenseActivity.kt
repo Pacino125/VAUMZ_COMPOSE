@@ -223,7 +223,8 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
-                    .height(48.dp)
+                    .height(48.dp),
+                enabled = fishingSessions?.any { it.isActive  && it.areaId.chap == false } ?: false
             ) {
                 Text(text = stringResource(R.string.license_add_fish))
             }
