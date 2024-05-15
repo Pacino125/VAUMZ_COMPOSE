@@ -47,4 +47,6 @@
     <string name="fish_weight">Hmotnosť</string>
     <string name="fish_another_type">Ostatné</string>
     <string name="fish_white_fish">Belička</string>
+    <string name="fish_cancel">Zrušiť</string>
+    <string name="fish_add_to_license">Privlastniť</string>
 </resources>

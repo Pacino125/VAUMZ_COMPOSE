@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.myapplication.data.Area
 import com.example.myapplication.data.AreaType
@@ -465,6 +466,26 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         db.close()
 
         return fishTypes
+    }
+
+    fun addCatch(catch: Catch, fishingSessionGuid : String) {
+        val db = this.writableDatabase
+        val values = ContentValues().apply {
+            put("guid", catch.guid)
+            put("fish_type_guid", catch.fishType!!.guid)
+            put("fish_count", catch.fishCount)
+            put("length", catch.length)
+            put("weight", catch.weight)
+        }
+
+        db.insert("tbl_catch", null, values)
+
+        val sessionValues = ContentValues().apply {
+            put("catch_guid", catch.guid)
+        }
+
+        db.update("tbl_fishing_session", sessionValues, "guid = ?", arrayOf(fishingSessionGuid))
+        db.close()
     }
 
     private fun executeInsertStatement(db: SQLiteDatabase, sqlStatement: String) {

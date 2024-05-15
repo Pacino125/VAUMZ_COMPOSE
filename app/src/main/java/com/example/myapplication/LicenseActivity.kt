@@ -217,6 +217,7 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
             Button(
                 onClick = {
                     val intent = Intent(context, FishActivity::class.java)
+                    intent.putExtra("FISHING_SESSION_GUID", fishingSessions!!.first { it.isActive }.guid)
                     context.startActivity(intent)
                 },
                 modifier = Modifier
