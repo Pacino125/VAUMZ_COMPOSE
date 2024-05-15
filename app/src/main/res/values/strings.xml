@@ -42,4 +42,9 @@
     <string name="error_email_at">Email musí obsahovať @!</string>
     <string name="error_user_exists">Používateľ s týmto emailom už existuje!</string>
     <string name="error_different_passwords">Heslá sa nezhodujú!</string>
+    <string name="fish_count">Počet</string>
+    <string name="fish_length">Dĺžka</string>
+    <string name="fish_weight">Hmotnosť</string>
+    <string name="fish_another_type">Ostatné</string>
+    <string name="fish_white_fish">Belička</string>
 </resources>
