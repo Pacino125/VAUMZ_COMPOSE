@@ -215,7 +215,10 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { },
+                onClick = {
+                    val intent = Intent(context, FishActivity::class.java)
+                    context.startActivity(intent)
+                },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)

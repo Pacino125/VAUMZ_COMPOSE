@@ -37,6 +37,11 @@
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
         </activity>
+        <activity
+            android:name=".FishActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyApplication">
+        </activity>
     </application>
 
 </manifest>
