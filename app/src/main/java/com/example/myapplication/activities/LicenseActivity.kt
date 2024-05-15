@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.activities
 
 import android.app.Activity
 import android.content.Context
@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.FishingSession
 import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme

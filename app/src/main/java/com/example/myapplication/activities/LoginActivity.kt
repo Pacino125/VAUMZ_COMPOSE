@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.uiComponents.ClickableText

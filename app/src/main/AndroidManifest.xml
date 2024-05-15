@@ -13,7 +13,7 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
             <intent-filter>
@@ -23,22 +23,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
         </activity>
         <activity
-            android:name=".LicenseActivity"
+            android:name=".activities.LicenseActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
         </activity>
         <activity
-            android:name=".SelectAreaManuallyActivity"
+            android:name=".activities.SelectAreaManuallyActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
         </activity>
         <activity
-            android:name=".FishActivity"
+            android:name=".activities.FishActivity"
             android:exported="true"
             android:theme="@style/Theme.MyApplication">
         </activity>
