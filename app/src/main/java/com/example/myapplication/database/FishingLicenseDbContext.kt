@@ -439,6 +439,34 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         db.close()
     }
 
+    fun getAllFishTypes(): List<FishType> {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM tbl_fish_type", null)
+        val fishTypes = mutableListOf<FishType>()
+
+        while (cursor.moveToNext()) {
+            val guidIndex = cursor.getColumnIndex("guid")
+            val typeIndex = cursor.getColumnIndex("type")
+            val minCatchLengthIndex = cursor.getColumnIndex("min_catch_length")
+            val maxCatchLengthIndex = cursor.getColumnIndex("max_catch_length")
+
+            if (guidIndex != -1 && typeIndex != -1 && minCatchLengthIndex != -1 && maxCatchLengthIndex != -1) {
+                val guid = cursor.getString(guidIndex)
+                val type = cursor.getString(typeIndex)
+                val minCatchLength = cursor.getInt(minCatchLengthIndex)
+                val maxCatchLength = cursor.getInt(maxCatchLengthIndex)
+
+                val fishType = FishType(guid, type, minCatchLength, maxCatchLength)
+                fishTypes.add(fishType)
+            }
+        }
+
+        cursor.close()
+        db.close()
+
+        return fishTypes
+    }
+
     private fun executeInsertStatement(db: SQLiteDatabase, sqlStatement: String) {
         db.execSQL(sqlStatement)
     }
