@@ -190,7 +190,8 @@ fun FishButtons(
                 val intent = Intent(context, LicenseActivity::class.java)
                 context.startActivity(intent)
             },
-            text = stringResource(R.string.fish_cancel)
+            text = stringResource(R.string.fish_cancel),
+            shouldBeEnabled = true
         )
         FishButton(
             onClick = {
@@ -199,18 +200,29 @@ fun FishButtons(
                 val intent = Intent(context, LicenseActivity::class.java)
                 context.startActivity(intent)
             },
-            text = stringResource(R.string.fish_add_to_license)
+            text = stringResource(R.string.fish_add_to_license),
+            shouldBeEnabled =
+                if (((selectedFishType.type == stringResource(R.string.fish_white_fish)
+                    || selectedFishType.type == stringResource(R.string.fish_another_type))
+                    && countValue.toIntOrNull() != null && weightValue.toDoubleOrNull() != null)) {
+                    true
+                } else if (lengthValue.toIntOrNull() != null && weightValue.toDoubleOrNull() != null) {
+                    true
+                } else {
+                    false
+                }
         )
     }
 }
 
 @Composable
-fun FishButton(onClick: () -> Unit, text: String) {
+fun FishButton(onClick: () -> Unit, text: String, shouldBeEnabled: Boolean) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .padding(horizontal = 8.dp)
-            .height(48.dp)
+            .height(48.dp),
+        enabled = shouldBeEnabled
     ) {
         Text(text = text)
     }
