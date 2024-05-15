@@ -25,11 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -64,11 +63,10 @@ class FishActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid : String?) {
+fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid: String?) {
     val selectedFishTypeId = rememberSaveable { mutableStateOf(fishTypes[0].guid) }
-    var selectedFishType by remember { mutableStateOf(fishTypes.find { it.guid == selectedFishTypeId.value } ?: fishTypes[0]) }
+    val selectedFishType = remember { mutableStateOf(fishTypes.find { it.guid == selectedFishTypeId.value } ?: fishTypes[0]) }
     val expanded = rememberSaveable { mutableStateOf(false) }
     val countValue = rememberSaveable { mutableStateOf("") }
     val lengthValue = rememberSaveable { mutableStateOf("") }
@@ -81,115 +79,149 @@ fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid :
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+        FishDropdown(selectedFishTypeId, selectedFishType, expanded, fishTypes)
+        Spacer(modifier = Modifier.height(16.dp))
+        FishTextField(
+            value = countValue.value,
+            onValueChange = { countValue.value = it },
+            label = stringResource(R.string.fish_count),
+            enabled = selectedFishType.value.type in listOf(
+                stringResource(R.string.fish_another_type),
+                stringResource(R.string.fish_white_fish)
+            )
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        FishTextField(
+            value = lengthValue.value,
+            onValueChange = { lengthValue.value = it },
+            label = stringResource(R.string.fish_length),
+            enabled = selectedFishType.value.type !in listOf(
+                stringResource(R.string.fish_another_type),
+                stringResource(R.string.fish_white_fish)
+            )
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        FishTextField(
+            value = weightValue.value,
+            onValueChange = { weightValue.value = it },
+            label = stringResource(R.string.fish_weight)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        FishButtons(context, fishingSessionGuid, selectedFishType.value, countValue.value, lengthValue.value, weightValue.value)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FishDropdown(
+    selectedFishTypeId: MutableState<String>,
+    selectedFishType: MutableState<FishType>,
+    expanded: MutableState<Boolean>,
+    fishTypes: List<FishType>
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded.value,
+            onExpandedChange = { expanded.value = !expanded.value }
         ) {
-            ExposedDropdownMenuBox(
+            TextField(
+                value = TextFieldValue(selectedFishType.value.type),
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
                 expanded = expanded.value,
-                onExpandedChange = { expanded.value = !expanded.value }
+                onDismissRequest = { expanded.value = false }
             ) {
-                TextField(
-                    value = TextFieldValue(selectedFishType.type),
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded.value,
-                    onDismissRequest = { expanded.value = false }
-                ) {
-                    fishTypes.forEach {
-                        DropdownMenuItem(
-                            text = { Text(text = it.type) },
-                            onClick = {
-                                selectedFishTypeId.value = it.guid
-                                selectedFishType = it
-                                expanded.value = false
-                            }
-                        )
-                    }
+                fishTypes.forEach { fishType ->
+                    DropdownMenuItem(
+                        text = { Text(text = fishType.type) },
+                        onClick = {
+                            selectedFishTypeId.value = fishType.guid
+                            selectedFishType.value = fishType
+                            expanded.value = false
+                        }
+                    )
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = countValue.value,
-            onValueChange = { countValue.value = it },
-            label = { Text(stringResource(R.string.fish_count)) },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-            ),
-            singleLine = true,
-            enabled = selectedFishType.type in listOf(stringResource(R.string.fish_another_type),
-                stringResource(
-                    R.string.fish_white_fish
-                )
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = lengthValue.value,
-            onValueChange = { lengthValue.value = it },
-            label = { Text(stringResource(R.string.fish_length)) },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-            ),
-            singleLine = true,
-            enabled = selectedFishType.type !in listOf(stringResource(R.string.fish_another_type),
-                stringResource(
-                    R.string.fish_white_fish
-                )
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = weightValue.value,
-            onValueChange = { weightValue.value = it },
-            label = { Text(stringResource(R.string.fish_weight)) },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-            ),
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Button(
-                onClick = {
-                    val intent = Intent(context, LicenseActivity::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
-                    .height(48.dp)
-            ) {
-                Text(text = stringResource(R.string.fish_cancel))
-            }
-            Button(
-                onClick = {
-                    val catch = Catch(
-                        UUID.randomUUID().toString(),
-                        selectedFishType,
-                        countValue.value.toIntOrNull() ?: 1,
-                        lengthValue.value.toIntOrNull(),
-                        weightValue.value.toDoubleOrNull() ?: 0.0
-                    )
-                    FishingLicenseDbContext(context).addCatch(catch, fishingSessionGuid!!)
-                    val intent = Intent(context, LicenseActivity::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-                    .height(48.dp)
-            ) {
-                Text(text = stringResource(R.string.fish_add_to_license))
-            }
-        }
     }
+}
+
+@Composable
+fun FishTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    enabled: Boolean = true
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+        ),
+        singleLine = true,
+        enabled = enabled
+    )
+}
+
+@Composable
+fun FishButtons(
+    context: Context,
+    fishingSessionGuid: String?,
+    selectedFishType: FishType,
+    countValue: String,
+    lengthValue: String,
+    weightValue: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        FishButton(
+            onClick = {
+                val intent = Intent(context, LicenseActivity::class.java)
+                context.startActivity(intent)
+            },
+            text = stringResource(R.string.fish_cancel)
+        )
+        FishButton(
+            onClick = {
+                val catch = createCatch(selectedFishType, countValue, lengthValue, weightValue)
+                FishingLicenseDbContext(context).addCatch(catch, fishingSessionGuid!!)
+                val intent = Intent(context, LicenseActivity::class.java)
+                context.startActivity(intent)
+            },
+            text = stringResource(R.string.fish_add_to_license)
+        )
+    }
+}
+
+@Composable
+fun FishButton(onClick: () -> Unit, text: String) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .height(48.dp)
+    ) {
+        Text(text = text)
+    }
+}
+
+fun createCatch(selectedFishType: FishType, countValue: String, lengthValue: String, weightValue: String): Catch {
+    return Catch(
+        UUID.randomUUID().toString(),
+        selectedFishType,
+        countValue.toIntOrNull() ?: 1,
+        lengthValue.toIntOrNull(),
+        weightValue.toDoubleOrNull() ?: 0.0
+    )
 }
