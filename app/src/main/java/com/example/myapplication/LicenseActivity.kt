@@ -32,13 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.FishingSession
-import com.example.myapplication.data.User
 import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.time.format.DateTimeFormatter
 
 class LicenseActivity : ComponentActivity() {
-    private var currentUser: User? = null
     private var fishingSessions: List<FishingSession>? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -46,13 +44,12 @@ class LicenseActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val dbContext = FishingLicenseDbContext(this)
-        currentUser = dbContext.getUserByGuid(intent.getStringExtra("USER_GUID"))
         fishingSessions = dbContext.getFishingSessions().sortedByDescending { it.date }
 
         setContent {
             MyApplicationTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    LicenseScreen(fishingSessions, currentUser!!)
+                    LicenseScreen(fishingSessions)
                 }
             }
         }
@@ -61,7 +58,7 @@ class LicenseActivity : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LicenseScreen(fishingSessions: List<FishingSession>?, currentUser: User) {
+fun LicenseScreen(fishingSessions: List<FishingSession>?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,7 +79,7 @@ fun LicenseScreen(fishingSessions: List<FishingSession>?, currentUser: User) {
             FishingSessionsSection(fishingSessions)
         }
 
-        ActionButtons(LocalContext.current, fishingSessions, currentUser)
+        ActionButtons(LocalContext.current, fishingSessions)
     }
 }
 
@@ -97,6 +94,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
             .padding(horizontal = 16.dp)
             .then(Modifier.verticalScroll(scrollState))
     ) {
+        //Header
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -144,6 +142,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
             )
         }
 
+        //values under header
         fishingSessions.forEach { session ->
             Row(
                 modifier = Modifier
@@ -165,6 +164,8 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
+                // If you have active fishing session, then do not display values within catch columns
+                // If fishing session is not active and catch doesn't have value, display ---
                 Text(
                     text = if (session.isActive) {
                         ""
@@ -207,7 +208,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
 }
 
 @Composable
-fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, currentUser: User) {
+fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -218,6 +219,8 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            //Button is disabled, when you don't have active fishing session
+            // or when you have active session in area, which is chap (catch and release)
             Button(
                 onClick = {
                     val intent = Intent(context, FishActivity::class.java)
@@ -233,6 +236,8 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                 Text(text = stringResource(R.string.license_add_fish))
             }
 
+            //If you have active fishing session, then display button for ending it
+            // Otherwise display start fishing session button
             if (fishingSessions != null && fishingSessions.any { it.isActive }) {
                 Button(
                     onClick = {
@@ -253,7 +258,6 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, curr
                 Button(
                     onClick = {
                         val intent = Intent(context, SelectAreaManuallyActivity::class.java)
-                        intent.putExtra("USER_GUID", currentUser.guid)
                         context.startActivity(intent)
                     },
                     modifier = Modifier

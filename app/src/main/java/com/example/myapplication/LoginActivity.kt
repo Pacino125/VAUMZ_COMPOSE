@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -94,7 +93,6 @@ fun authenticate(context: android.content.Context, email: String, password: Stri
     val user = dbContext.getUserByEmail(email)
     if (user != null && user.password == password) {
         val intent = Intent(context, LicenseActivity::class.java)
-        intent.putExtra("USER_GUID", user.guid)
         context.startActivity(intent)
         (context as? Activity)?.finish()
     } else {

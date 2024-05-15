@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.Area
 import com.example.myapplication.data.FishingSession
-import com.example.myapplication.data.User
 import com.example.myapplication.database.FishingLicenseDbContext
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.time.LocalDateTime
@@ -41,18 +40,14 @@ import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SelectAreaManuallyActivity : ComponentActivity() {
-    private var currentUser: User? = null
     private var allAreas: List<Area>? = null
     private var areasInUserOrganization: List<Area>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val dbContext = FishingLicenseDbContext(this)
-        currentUser = dbContext.getUserByGuid(intent.getStringExtra("USER_GUID"))
         allAreas = dbContext.getAllAreas()
-        if (currentUser != null) {
-            areasInUserOrganization = dbContext.getAreasInUserOrganization(currentUser?.organizationGuid ?: "")
-        }
+        //areasInUserOrganization = dbContext.getAreasInUserOrganization(currentUser?.organizationGuid ?: "")
 
         setContent {
             MyApplicationTheme {
@@ -68,7 +63,6 @@ class SelectAreaManuallyActivity : ComponentActivity() {
 @Composable
 fun SelectAreaManuallyScreen(allAreas: List<Area>?, areasInUserOrganization: List<Area>?) {
     val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
-
     val scrollState = rememberScrollState()
 
     Column(
@@ -137,7 +131,6 @@ fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, context: Con
                         val selectedArea = areas[selectedAreaIndex.value]
                         val session = FishingSession(
                             guid = UUID.randomUUID().toString(),
-                            licenseId = null,
                             areaId = selectedArea,
                             date = LocalDateTime.now(),
                             isActive = true,

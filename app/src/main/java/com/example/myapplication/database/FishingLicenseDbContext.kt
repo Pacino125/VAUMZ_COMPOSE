@@ -24,15 +24,12 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(CREATE_USER_TABLE_QUERY)
         db.execSQL(CREATE_FISH_TYPE_TABLE_QUERY)
-        db.execSQL(CREATE_LICENSE_TABLE_QUERY)
-        db.execSQL(CREATE_LICENSE_TYPE_TABLE_QUERY)
         db.execSQL(CREATE_CATCH_TABLE_QUERY)
         db.execSQL(CREATE_FISHING_SESSION_TABLE_QUERY)
         db.execSQL(CREATE_AREA_TABLE_QUERY)
         db.execSQL(CREATE_AREA_TYPE_TABLE_QUERY)
         db.execSQL(CREATE_COORDINATES_TABLE_QUERY)
         db.execSQL(CREATE_ORGANIZATIONS_TABLE_QUERY)
-        insertInitialLicenseTypes(db)
         insertInitialFishTypes(db)
         insertInitialOrganizations(db)
         insertInitialLipnoveCoordinates(db)
@@ -72,25 +69,6 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
             )
         """
 
-        private const val CREATE_LICENSE_TABLE_QUERY = """
-            CREATE TABLE tbl_license (
-                guid TEXT PRIMARY KEY,
-                license_type_guid TEXT,
-                user_guid TEXT,
-                year INTEGER
-            )
-        """
-
-        private const val CREATE_LICENSE_TYPE_TABLE_QUERY = """
-            CREATE TABLE tbl_license_type (
-                guid TEXT PRIMARY KEY,
-                type TEXT,
-                description TEXT,
-                price_for_adult INTEGER,
-                price_for_child INTEGER
-            )
-        """
-
         private const val CREATE_CATCH_TABLE_QUERY = """
             CREATE TABLE tbl_catch (
                 guid TEXT PRIMARY KEY,
@@ -104,7 +82,6 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         private const val CREATE_FISHING_SESSION_TABLE_QUERY = """
             CREATE TABLE tbl_fishing_session (
                 guid TEXT PRIMARY KEY,
-                license_guid TEXT,
                 area_guid TEXT,
                 date INTEGER,
                 is_active INTEGER,
@@ -404,7 +381,7 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
                     calendar.get(Calendar.SECOND)
                 )
 
-                val fishingSession = FishingSession(sessionGuid, null, area, localDateTime, isActive, catch)
+                val fishingSession = FishingSession(sessionGuid, area, localDateTime, isActive, catch)
                 fishingSessions.add(fishingSession)
             }
         }
@@ -419,7 +396,6 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         val db = this.writableDatabase
         val values = ContentValues().apply {
             put("guid", fishingSession.guid)
-            put("license_guid", fishingSession.licenseId?.guid)
             put("area_guid", areaId)
             put("date", fishingSession.date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
             put("is_active", fishingSession.isActive)
@@ -570,39 +546,6 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         executeInsertStatement(db, "INSERT INTO tbl_organizations (guid, name) VALUES ('E782EE53-3D1F-492C-92D1-60F545F088DE', 'Žarnovica')")
         executeInsertStatement(db, "INSERT INTO tbl_organizations (guid, name) VALUES ('3AB302CA-146E-4168-B174-DB8C57B4DF84', 'Žiar nad Hronom')")
         executeInsertStatement(db, "INSERT INTO tbl_organizations (guid, name) VALUES ('87B24368-6637-4BFC-B1F5-032F76B30DB6', 'Žilina')")
-    }
-
-    private fun insertInitialLicenseTypes(db: SQLiteDatabase) {
-        executeInsertStatement(
-            db,
-            "INSERT INTO tbl_license_type (guid, type, description, price_for_adult, price_for_child) " +
-                    "VALUES ('BD979080-113E-4573-802F-46996D1AD69C', 'Kaprové vody', " +
-                    "'Kaprové vody sú vody, ktoré svojím charakterom a kvalitou vytvárajú prostredie na život predovšetkým takých druhov rýb, akými sú kapor sazan (Cyprinus carpio - divá forma), kapor rybničný (Cyprinus carpio - zdomácnená forma), šťuka severná (Esox lucius), zubáč veľkoústy (Stizostedion lucioperca), sumec veľký (Silurus glanis) a úhor európsky (Anguilla anguilla). Významné sprievodné druhy rýb sú hlavátka podunajská (Hucho hucho), podustva severná (Chondrostoma nasus), mrena severná (Barbus barbus), jalec hlavatý (Leuciscus cephalus) a jalec maloústy (Leuciscus leuciscus).&V kaprových vodách sa zakazuje:|a) loviť na viac ako dve udice|b) loviť na viac ako dva nadväzce na jednej udici opatrené jednoduchým háčikom alebo na viac ako jeden nadväzec opatrený dvojháčikom alebo trojháčikom a na viac ako tri mušky pri použití muškárskej udice|c) loviť na rybku prinesenú z iného revíru|d) loviť na rybku alebo prívlač od 1. februára do 15. júna|e) pri love na prívlač loviť na viac ako jednu udicu s viac ako jednou nástrahou|f) loviť v čase od 22.00 do 04.00 h bez osvetlenia miesta lovu', 60, 20)"
-        )
-        executeInsertStatement(
-            db,
-            "INSERT INTO tbl_license_type (guid, type, description, price_for_adult, price_for_child) " +
-                    "VALUES ('4D8FEA6F-9C08-45EF-A3A9-2E2823D46C85', 'Pstruhové vody', " +
-                    "'Pstruhové vody sú vody, ktoré svojím charakterom a kvalitou vytvárajú prostredie na život predovšetkým takých druhov rýb, akými sú pstruh potočný  (Salmo trutta morpha fario), pstruh dúhový (Oncorhynchus mykiss), sivoň potočný (Salvelinus fontinalis), hlavátka podunajská (Hucho hucho) a lipeň tymiánový (Thymallus thymallus). Významné sprievodné druhy rýb sú hlaváč bieloplutvý (Cottus gobio), hlaváč pásoplutvý (Cottus poecilopus), čerebľa pestrá (Phoxinus phoxinus) a slíž severný (Barbatula barbatula).&V pstruhových vodách sa zakazuje:|a) loviť viac než jednou udicou|b) používat ako nástrahu živú rybku|c) používat pri love iné ako umelé mušky v počte väčšom než tri|d) pri love prívlačou na mŕtvu rybku používať viac než jeden háčik|e) loviť na plávanú a položenú|f) používať pri love viac ako jednu nástrahu okrem lovu na umelé mušky|g) používat ako nástrahu červy a hmyz vo všetkých vývojových štádiách|h) loviť viac ako tri dni v týždni', 30, 15)"
-        )
-        executeInsertStatement(
-            db,
-            "INSERT INTO tbl_license_type (guid, type, description, price_for_adult) " +
-                    "VALUES ('F20E2FAD-1D3D-4295-B997-DC2E8C9EEF6E', 'Lipňové vody', " +
-                    "'V lipňových vodách sa zakazuje:|a) loviť viac než jednou udicou|b)používať ako nástrahu živú rybku|c) používať pri love iné ako umelé mušky v počte väčšom než tri a iné ako muškárske náradie|d )loviť na mŕtvu rybku alebo prívlač od 1. júna do 31. októbra|e) používať pri love na plávanú iné nástrahy ako rastlinného pôvodu|f) loviť ryby na položenú|g) používať ako nástrahu hmyz vo všetkých vývojových štádiách, červy všetkých druhov, ryžu, tarhoňu, krúpy a všetky napodobneniny ikier|h) loviť viac ako pät dní v týždni', 70)"
-        )
-        executeInsertStatement(
-            db,
-            "INSERT INTO tbl_license_type (guid, type, description, price_for_adult) " +
-                    "VALUES ('3306AA97-0047-4BAA-BEFA-5AE510B49E73', 'Povolenie na lov hlavátky', " +
-                    "'Pri love hlavátky sa zakazuje:|a) používať ako nástrahu živú rybku|b) loviť hlavátku inak než prívlačou na umelé nástrahy, rybku alebo muškárením|c) ponechať si v jednom kalendárnom roku viac ako jednu hlavátku, aj keď sa lov uskutočnuje vo viacerých revíroch', 100)"
-        )
-        executeInsertStatement(
-            db,
-            "INSERT INTO tbl_license_type (guid, type, description, price_for_adult, price_for_child) " +
-                    "VALUES ('33910006-977D-4C3E-90CD-8C1E91156EB2', 'Zväzové povolenie', " +
-                    "'Zväzové vody sú vody, ktoré svojím charakterom a kvalitou vytvárajú prostredie na život predovšetkým takých druhov rýb, akými sú kapor sazan (Cyprinus carpio - divá forma), kapor rybničný (Cyprinus carpio - zdomácnená forma), šťuka severná (Esox lucius), zubáč velkoústy (Stizostedion lucioperca), sumec velký (Silurus glanis) a úhor európsky (Anguilla anguilla). Významné sprievodné druhy rýb sú hlavátka podunajská (Hucho hucho), podustva severná (Chondrostoma nasus), mrena severná (Barbus barbus), jalec hlavatý (Leuciscus cephalus) a jalec maloústy (Leuciscus leuciscus).&V kaprových vodách sa zakazuje:|a) loviť na viac ako dve udice|b) loviť na viac ako dva nadväzce na jednej udici opatrené jednoduchým háčikom alebo na viac ako jeden nadväzec opatrený dvojháčikom alebo trojháčikom a na viac ako tri mušky pri použití muškárskej udice|c) loviť na rybku prinesenú z iného revíru|d) loviť na rybku alebo prívlač od 1. februára do 15. júna|e) pri love na prívlač loviť na viac ako jednu udicu s viac ako jednou nástrahou|f) loviť v čase od 22.00 do 04.00 h bez osvetlenia miesta lovu', 75, 15)"
-        )
     }
 
     private fun insertInitialFishTypes(db: SQLiteDatabase) {

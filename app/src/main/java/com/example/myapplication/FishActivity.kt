@@ -79,7 +79,7 @@ fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid: 
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        FishDropdown(selectedFishTypeId, selectedFishType, expanded, fishTypes)
+        FishDropdown(selectedFishTypeId, selectedFishType, countValue, lengthValue, weightValue , expanded, fishTypes)
         Spacer(modifier = Modifier.height(16.dp))
         FishTextField(
             value = countValue.value,
@@ -116,6 +116,9 @@ fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid: 
 fun FishDropdown(
     selectedFishTypeId: MutableState<String>,
     selectedFishType: MutableState<FishType>,
+    selectedCount: MutableState<String>,
+    selectedLength: MutableState<String>,
+    selectedWeight: MutableState<String>,
     expanded: MutableState<Boolean>,
     fishTypes: List<FishType>
 ) {
@@ -141,9 +144,13 @@ fun FishDropdown(
                 fishTypes.forEach { fishType ->
                     DropdownMenuItem(
                         text = { Text(text = fishType.type) },
+                        //reset all values in textfields after selecting another type of fish
                         onClick = {
                             selectedFishTypeId.value = fishType.guid
                             selectedFishType.value = fishType
+                            selectedCount.value = ""
+                            selectedLength.value = ""
+                            selectedWeight.value = ""
                             expanded.value = false
                         }
                     )
@@ -195,12 +202,16 @@ fun FishButtons(
         )
         FishButton(
             onClick = {
+                //Create new catch in tbl_catch and assign him to current fishing session.
+                //End current fishing session.
                 val catch = createCatch(selectedFishType, countValue, lengthValue, weightValue)
                 FishingLicenseDbContext(context).addCatch(catch, fishingSessionGuid!!)
                 val intent = Intent(context, LicenseActivity::class.java)
                 context.startActivity(intent)
             },
             text = stringResource(R.string.fish_add_to_license),
+            //If type of fish is white fish or other, then you need to have values in count and weight
+            //When you have other types, you need to have values in length and weight
             shouldBeEnabled =
                 if (((selectedFishType.type == stringResource(R.string.fish_white_fish)
                     || selectedFishType.type == stringResource(R.string.fish_another_type))
