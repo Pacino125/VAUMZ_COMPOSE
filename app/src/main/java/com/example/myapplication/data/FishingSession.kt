@@ -1,9 +1,13 @@
 package com.example.myapplication.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
+@Entity(tableName = "tbl_fishing_session")
 data class FishingSession(
-    val guid: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val areaId: Area,
     val date: LocalDateTime,
     var isActive: Boolean,

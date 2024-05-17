@@ -1,7 +1,6 @@
 package com.example.myapplication.screens
 
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -29,16 +28,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.activities.LicenseActivity
 import com.example.myapplication.data.Area
 import com.example.myapplication.data.FishingSession
-import com.example.myapplication.database.FishingLicenseDbContext
+import com.example.myapplication.events.AreaEvent
+import com.example.myapplication.states.AreaState
 import java.time.LocalDateTime
-import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SelectAreaManuallyScreen(allAreas: List<Area>?, areasInUserOrganization: List<Area>?) {
+fun SelectAreaManuallyScreen(state: AreaState, onEvent: (AreaEvent) -> Unit) {
     val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
     val scrollState = rememberScrollState()
 
@@ -57,21 +55,11 @@ fun SelectAreaManuallyScreen(allAreas: List<Area>?, areasInUserOrganization: Lis
                 fontSize = 20.sp
             )
 
-            if (allAreas != null) {
-                Text(
-                    text = stringResource(R.string.state_areas_text),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                Table(allAreas, selectedAreaIndex, LocalContext.current)
-            }
-
-            if (areasInUserOrganization != null) {
-                Text(
-                    text = stringResource(R.string.areas_in_organization_text),
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                )
-                Table(areasInUserOrganization, selectedAreaIndex, LocalContext.current)
-            }
+            Text(
+                text = stringResource(R.string.state_areas_text),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Table(state.areas, selectedAreaIndex, LocalContext.current)
         }
     }
 }
@@ -88,7 +76,6 @@ fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, context: Con
                 header = true,
                 areaName = stringResource(R.string.select_area_area_name),
                 areaId = stringResource(R.string.select_area_area_number),
-                areaType = stringResource(R.string.select_area_area_type),
                 chap = stringResource(R.string.select_area_area_chap)
             )
 
@@ -97,26 +84,23 @@ fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, context: Con
                     header = false,
                     areaName = area.name,
                     areaId = area.areaId,
-                    areaType = area.areaTypeId!!.type,
                     chap = if (area.chap == true) stringResource(R.string.yes) else stringResource(R.string.no),
                     selected = selectedAreaIndex.value == index
                 ) {
                     if (selectedAreaIndex.value != index) {
                         selectedAreaIndex.value = index
                     } else {
-                        val dbHelper = FishingLicenseDbContext(context)
                         val selectedArea = areas[selectedAreaIndex.value]
                         val session = FishingSession(
-                            guid = UUID.randomUUID().toString(),
                             areaId = selectedArea,
                             date = LocalDateTime.now(),
                             isActive = true,
                             catchId = null
                         )
 
-                        dbHelper.insertFishingSession(session, selectedArea.guid)
+                        /*dbHelper.insertFishingSession(session, selectedArea.guid)
                         val intent = Intent(context, LicenseActivity::class.java)
-                        context.startActivity(intent)
+                        context.startActivity(intent)*/
                     }
                 }
             }
@@ -129,7 +113,6 @@ fun TableRow(
     header: Boolean,
     areaName: String,
     areaId: String,
-    areaType: String,
     chap: String,
     selected: Boolean = false,
     onClick: () -> Unit = {}
@@ -153,10 +136,6 @@ fun TableRow(
         )
         Text(
             text = areaId,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = areaType,
             modifier = Modifier.weight(1f)
         )
         Text(

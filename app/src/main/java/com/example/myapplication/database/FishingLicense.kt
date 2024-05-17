@@ -1,25 +1,19 @@
 package com.example.myapplication.database
 
-import android.content.ContentValues
-import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import android.os.Build
-import androidx.annotation.RequiresApi
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import com.example.myapplication.daos.AreaDao
 import com.example.myapplication.data.Area
-import com.example.myapplication.data.AreaType
-import com.example.myapplication.data.Catch
-import com.example.myapplication.data.FishType
-import com.example.myapplication.data.FishingSession
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Locale
 
-class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+@Database(
+    entities = [Area::class],
+    version = 1
+)
+abstract class FishingLicense: RoomDatabase() {
 
-    override fun onCreate(db: SQLiteDatabase) {
+    abstract val areaDao : AreaDao
+
+    /*override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(CREATE_FISH_TYPE_TABLE_QUERY)
         db.execSQL(CREATE_CATCH_TABLE_QUERY)
         db.execSQL(CREATE_FISHING_SESSION_TABLE_QUERY)
@@ -321,44 +315,44 @@ class FishingLicenseDbContext(context : Context) :   SQLiteOpenHelper(context, D
         executeInsertStatement(db, "INSERT INTO tbl_area_type(guid, type) VALUES ('7C1BB848-0DA0-4805-8D62-C3A545F727EC', 'Kaprová voda celozväzová')")
     }
 
-    private fun insertInitialLipnoveAreas(db: SQLiteDatabase) {
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('F197C5E3-EAFB-4D4A-9C77-B4B4051F0F37', 'Hron č. 9a (H)', '3-1110-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('37A34EE5-4DAD-4B0E-8A8B-427DAD5CE371', 'Hron č. 9b (H)', '3-1111-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('5E51447D-290B-4074-8148-29DDC4470D28', 'Hron č. 11a (H)', '3-1130-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('D8AA6BE6-BF83-49A9-AED7-B9C78F43C877', 'Hron č. 11b (H)', '3-1131-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('9C3CB2EE-6944-42A7-BE76-CAC6F067ED39', 'Rohozná', '3-3350-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid, chap) VALUES ('B2BD8EA7-525F-4D36-B5C2-A446AE2AC57D', 'Bystrica č. 1a', '3-0380-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8', 1")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('32AC227A-6AD5-432F-BE01-092AE4C20EB6', 'Bystrica č. 1b', '3-0381-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('F8971821-1C2C-4626-B68E-22BD4B8A62A5', 'Čierňanka č. 1', '3-0540-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('C73C5B4F-B54D-4BF3-93BE-2D04EAB003A7', 'Orava č. 1a (H)', '3-2710-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('870B24DD-E02F-4588-9530-3E8CF6F72874', 'Udava č. 1', '4-3020-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('B6CBF321-5FC5-40B7-AB0C-45CCAE9AE286', 'Poprad č. 4 (H)', '4-1970-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('463032E1-0207-419B-BB68-C548A6F8BCF8', 'Turiec č. 1b (H)', '3-4431-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('B6854EC8-8ECE-4185-A5DD-D023EDD6D66F', 'Váh č. 16 (H)', '3-4650-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('F20732AC-10D5-4158-B273-8B58D99429D7', 'Biela Orava č. 2', '3-0080-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('16838F43-5498-4C7C-8A99-93FE9A37A9C0', 'Poprad č. 2a (H)', '4-1950-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('ACEF3C71-7087-48FA-96CF-DA96D554806C', 'Poprad č. 2c (H)', '4-1952-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('995BC028-C8C8-4B88-82FD-D480CE2F4767', 'Čierny Hron č. 1 (H)', '3-0560-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('6F9D879A-E3AD-4A7E-A172-9312C3D903DB', 'Hron č. 10a (H)', '3-1120-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('1960F764-C47C-4A76-961C-7192FB84F9F9', 'Hron č. 10b (H)', '3-1121-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid, chap) VALUES ('FBD358CC-B5D8-494B-8E5A-B2FFF951D094', 'Orava č. 2a (H)', '3-2720-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8', 1")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('1330A168-6F37-408A-A90D-0A511FC413E3', 'Orava č. 2b (H)', '3-2721-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('63BB2B7A-B49B-4585-B703-AE6203949E2B', 'Rimava č. 3', '3-3270-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('535A7EDB-1134-410D-B6F5-BB00A641D452', 'Váh č. 18a (H)', '3-4680-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('681F689E-AB4D-4969-93A2-871051D21F27', 'Poprad č. 5 (H)', '4-1980-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('87855189-97AD-4405-93B3-1239CE843A18', 'Dunajec č. 2 (H)', '4-0430-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid, chap) VALUES ('6F7D2B47-11B6-43B4-825B-5E6F1415F1CD', 'Poprad č. 3b (H)', '4-1961-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8', 1")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('F2175BEA-D92D-4A5A-82E4-CC8CAF97289D', 'Poprad č. 3a (H)', '4-1960-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('C2570FD7-5491-4FF0-AB2A-F6A649054630', 'Poprad č. 3c (H)', '4-1962-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('49BBF884-9896-4A8C-B847-A21567922076', 'Poprad č. 1 (H)', '4-1940-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('230F41CB-8ECC-4442-8D55-73F83E14F4CB', 'Orava č. 3 (H)', '3-2730-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('9D470533-0A5C-44E5-A477-ECFDAA094D12', 'Turiec č. 2 (H)', '3-4480-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('6EB3D99B-F42B-40D3-9E26-7E222088E7D5', 'Ondava č. 3', '4-1670-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('4AEC3BD9-E457-4517-9FB0-31E29518CC61', 'Hron č. 7b (H)', '3-1081-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('FBEE85C0-48ED-40C6-A9FF-123CE1461372', 'Rajčanka č. 1', '3-3130-5', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('7A9AFACF-1E8D-4A81-B9C7-0C41938334C4', 'Váh č. 15 (H)', '3-4640-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid, chap) VALUES ('FF35F45A-2969-41AA-8CDC-F1C0E6D89B20', 'Váh č.20', '3-4710-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8', 1)")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('8D104B35-E57A-452F-BFD2-EEF970D7EA5D', 'Poprad č. 2b (H)', '4-1951-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, area_type_guid) VALUES ('2039CA09-B2CC-4128-A638-9CF7E126BB87', 'Turiec č. 1 (H)', '3-4430-6', 'D780545C-BBB4-4A73-8BF6-97400B2797C8'")
-    }
+    private fun insertInitialAreas(db: SQLiteDatabase) {
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('F197C5E3-EAFB-4D4A-9C77-B4B4051F0F37', 'Hron č. 9a (H)', '3-1110-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('37A34EE5-4DAD-4B0E-8A8B-427DAD5CE371', 'Hron č. 9b (H)', '3-1111-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('5E51447D-290B-4074-8148-29DDC4470D28', 'Hron č. 11a (H)', '3-1130-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('D8AA6BE6-BF83-49A9-AED7-B9C78F43C877', 'Hron č. 11b (H)', '3-1131-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('9C3CB2EE-6944-42A7-BE76-CAC6F067ED39', 'Rohozná', '3-3350-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, chap) VALUES ('B2BD8EA7-525F-4D36-B5C2-A446AE2AC57D', 'Bystrica č. 1a', '3-0380-5', 1")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('32AC227A-6AD5-432F-BE01-092AE4C20EB6', 'Bystrica č. 1b', '3-0381-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('F8971821-1C2C-4626-B68E-22BD4B8A62A5', 'Čierňanka č. 1', '3-0540-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('C73C5B4F-B54D-4BF3-93BE-2D04EAB003A7', 'Orava č. 1a (H)', '3-2710-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('870B24DD-E02F-4588-9530-3E8CF6F72874', 'Udava č. 1', '4-3020-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('B6CBF321-5FC5-40B7-AB0C-45CCAE9AE286', 'Poprad č. 4 (H)', '4-1970-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('463032E1-0207-419B-BB68-C548A6F8BCF8', 'Turiec č. 1b (H)', '3-4431-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('B6854EC8-8ECE-4185-A5DD-D023EDD6D66F', 'Váh č. 16 (H)', '3-4650-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('F20732AC-10D5-4158-B273-8B58D99429D7', 'Biela Orava č. 2', '3-0080-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('16838F43-5498-4C7C-8A99-93FE9A37A9C0', 'Poprad č. 2a (H)', '4-1950-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('ACEF3C71-7087-48FA-96CF-DA96D554806C', 'Poprad č. 2c (H)', '4-1952-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('995BC028-C8C8-4B88-82FD-D480CE2F4767', 'Čierny Hron č. 1 (H)', '3-0560-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('6F9D879A-E3AD-4A7E-A172-9312C3D903DB', 'Hron č. 10a (H)', '3-1120-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('1960F764-C47C-4A76-961C-7192FB84F9F9', 'Hron č. 10b (H)', '3-1121-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, chap) VALUES ('FBD358CC-B5D8-494B-8E5A-B2FFF951D094', 'Orava č. 2a (H)', '3-2720-6', 1")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('1330A168-6F37-408A-A90D-0A511FC413E3', 'Orava č. 2b (H)', '3-2721-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('63BB2B7A-B49B-4585-B703-AE6203949E2B', 'Rimava č. 3', '3-3270-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('535A7EDB-1134-410D-B6F5-BB00A641D452', 'Váh č. 18a (H)', '3-4680-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('681F689E-AB4D-4969-93A2-871051D21F27', 'Poprad č. 5 (H)', '4-1980-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('87855189-97AD-4405-93B3-1239CE843A18', 'Dunajec č. 2 (H)', '4-0430-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, chap) VALUES ('6F7D2B47-11B6-43B4-825B-5E6F1415F1CD', 'Poprad č. 3b (H)', '4-1961-6', 1")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('F2175BEA-D92D-4A5A-82E4-CC8CAF97289D', 'Poprad č. 3a (H)', '4-1960-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('C2570FD7-5491-4FF0-AB2A-F6A649054630', 'Poprad č. 3c (H)', '4-1962-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('49BBF884-9896-4A8C-B847-A21567922076', 'Poprad č. 1 (H)', '4-1940-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('230F41CB-8ECC-4442-8D55-73F83E14F4CB', 'Orava č. 3 (H)', '3-2730-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('9D470533-0A5C-44E5-A477-ECFDAA094D12', 'Turiec č. 2 (H)', '3-4480-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('6EB3D99B-F42B-40D3-9E26-7E222088E7D5', 'Ondava č. 3', '4-1670-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('4AEC3BD9-E457-4517-9FB0-31E29518CC61', 'Hron č. 7b (H)', '3-1081-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('FBEE85C0-48ED-40C6-A9FF-123CE1461372', 'Rajčanka č. 1', '3-3130-5'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('7A9AFACF-1E8D-4A81-B9C7-0C41938334C4', 'Váh č. 15 (H)', '3-4640-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id, chap) VALUES ('FF35F45A-2969-41AA-8CDC-F1C0E6D89B20', 'Váh č.20', '3-4710-6', 1")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('8D104B35-E57A-452F-BFD2-EEF970D7EA5D', 'Poprad č. 2b (H)', '4-1951-6'")
+        executeInsertStatement(db, "INSERT INTO tbl_area (guid, name, area_id) VALUES ('2039CA09-B2CC-4128-A638-9CF7E126BB87', 'Turiec č. 1 (H)', '3-4430-6'")
+    }*/
 }
