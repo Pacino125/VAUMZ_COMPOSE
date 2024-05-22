@@ -13,25 +13,14 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
-            android:name=".activities.LicenseActivity"
+            android:name=".activities.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MyApplication">
+            android:theme="@style/Theme.MyApplication" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activities.SelectAreaManuallyActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyApplication">
-        </activity>
-        <activity
-            android:name=".activities.FishActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyApplication">
-        </activity>
     </application>
 
 </manifest>
