@@ -17,6 +17,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -27,16 +29,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.data.Area
-import com.example.myapplication.data.FishingSession
+import com.example.myapplication.entities.Area
+import com.example.myapplication.entities.FishingSession
 import com.example.myapplication.events.AreaEvent
-import com.example.myapplication.states.AreaState
+import com.example.myapplication.viewModels.AreaViewModel
 import java.time.LocalDateTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SelectAreaManuallyScreen(state: AreaState, onEvent: (AreaEvent) -> Unit) {
+fun SelectAreaManuallyScreen(onEvent: (AreaEvent) -> Unit, viewModel: AreaViewModel = hiltViewModel()) {
+    val areas by viewModel.areas.collectAsState()
     val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
     val scrollState = rememberScrollState()
 
@@ -59,7 +63,7 @@ fun SelectAreaManuallyScreen(state: AreaState, onEvent: (AreaEvent) -> Unit) {
                 text = stringResource(R.string.state_areas_text),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Table(state.areas, selectedAreaIndex, LocalContext.current)
+            Table(areas, selectedAreaIndex, LocalContext.current)
         }
     }
 }

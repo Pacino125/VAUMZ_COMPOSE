@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,15 +29,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.activities.FishActivity
-import com.example.myapplication.activities.SelectAreaManuallyActivity
-import com.example.myapplication.data.FishingSession
-import com.example.myapplication.database.FishingLicenseDbContext
+import com.example.myapplication.entities.FishingSession
+import com.example.myapplication.viewModels.LicenseViewModel
 import java.time.format.DateTimeFormatter
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myapplication.events.FishingSessionEvent
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LicenseScreen(fishingSessions: List<FishingSession>?) {
+fun LicenseScreen(viewModel: LicenseViewModel = hiltViewModel()) {
+    val fishingSessions by viewModel.fishingSessions.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,7 +60,7 @@ fun LicenseScreen(fishingSessions: List<FishingSession>?) {
             FishingSessionsSection(fishingSessions)
         }
 
-        ActionButtons(LocalContext.current, fishingSessions)
+        ActionButtons(LocalContext.current, fishingSessions, viewModel)
     }
 }
 
@@ -185,7 +189,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
 }
 
 @Composable
-fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
+fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, viewModel: LicenseViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +205,6 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
             Button(
                 onClick = {
                     val intent = Intent(context, FishActivity::class.java)
-                    intent.putExtra("FISHING_SESSION_GUID", fishingSessions!!.first { it.isActive }.guid)
                     context.startActivity(intent)
                 },
                 modifier = Modifier
@@ -218,10 +221,10 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
             if (fishingSessions != null && fishingSessions.any { it.isActive }) {
                 Button(
                     onClick = {
-                        val activeSession = fishingSessions.firstOrNull { it.isActive }
-                        activeSession?.let {
-                            FishingLicenseDbContext(context).updateFishingSessionIsActiveToFalse(it.guid)
-                        }
+                        val activeSession = fishingSessions.first { it.isActive }
+                        activeSession.isActive = false
+                        val event = FishingSessionEvent.UpsertFishingSession(activeSession)
+                        viewModel.onEvent(event)
                         (context as? Activity)?.recreate()
                     },
                     modifier = Modifier
