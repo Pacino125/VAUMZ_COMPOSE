@@ -12,5 +12,5 @@ interface IFishingSessionDao {
     suspend fun upsertFishingSession(fishingSession: FishingSession)
 
     @Query("SELECT * FROM tbl_fishing_session ORDER BY date ASC")
-    suspend fun getFishingSessionsOrderedByDate() : Flow<List<FishingSession>>
+    fun getFishingSessionsOrderedByDate() : Flow<List<FishingSession>>
 }
