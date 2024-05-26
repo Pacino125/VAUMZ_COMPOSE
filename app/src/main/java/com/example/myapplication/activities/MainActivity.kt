@@ -16,8 +16,10 @@ import com.example.myapplication.entities.Area
 import com.example.myapplication.entities.FishType
 import com.example.myapplication.screens.LicenseScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var db: FishingLicense
     private lateinit var fishTypeDao: IFishTypeDao

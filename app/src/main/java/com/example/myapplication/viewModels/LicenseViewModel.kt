@@ -6,12 +6,15 @@ import com.example.myapplication.entities.FishingSession
 import com.example.myapplication.events.FishingSessionEvent
 import com.example.myapplication.repositories.IFishingSessionRepository
 import com.example.myapplication.states.FishingSessionState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LicenseViewModel(private val repository: IFishingSessionRepository) : ViewModel() {
+@HiltViewModel
+class LicenseViewModel @Inject constructor(private val repository: IFishingSessionRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(FishingSessionState())
     private val _fishingSessions: MutableStateFlow<List<FishingSession>> = MutableStateFlow(emptyList())
