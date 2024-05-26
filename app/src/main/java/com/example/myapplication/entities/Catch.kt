@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Catch (
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val fishType : FishType,
+    val fishTypeId : Int,
     val fishCount : Int,
     val length : Int?,
     val weight : Double
