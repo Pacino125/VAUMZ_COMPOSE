@@ -8,6 +8,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.myapplication.daos.IAreaDao
 import com.example.myapplication.daos.IFishTypeDao
@@ -15,11 +18,12 @@ import com.example.myapplication.database.FishingLicense
 import com.example.myapplication.entities.Area
 import com.example.myapplication.entities.FishType
 import com.example.myapplication.screens.LicenseScreen
+import com.example.myapplication.screens.SelectAreaManuallyScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
+import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+
 class MainActivity : ComponentActivity() {
     private lateinit var db: FishingLicense
     private lateinit var fishTypeDao: IFishTypeDao
@@ -31,7 +35,22 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    LicenseScreen()
+                    val navController = rememberNavController()
+                    NavHost(
+                        navController = navController,
+                        startDestination = LicenseObject
+                    ) {
+                        composable<LicenseObject> {
+                            LicenseScreen(navigateToSelectArea = { navController.navigate(SelectAreaManuallyObject) },
+                                    navigateToFish = { navController.navigate(FishObject) })
+                        }
+                        composable<FishObject> {
+                            //FishScreen()
+                        }
+                        composable<SelectAreaManuallyObject> {
+                            SelectAreaManuallyScreen()
+                        }
+                    }
                 }
             }
         }
@@ -126,3 +145,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@Serializable
+object LicenseObject
+
+@Serializable
+object FishObject
+
+@Serializable
+object SelectAreaManuallyObject
