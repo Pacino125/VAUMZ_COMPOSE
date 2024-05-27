@@ -13,4 +13,7 @@ interface IFishingSessionDao {
 
     @Query("SELECT * FROM tbl_fishing_session ORDER BY date DESC")
     fun getFishingSessionsOrderedByDate() : Flow<List<FishingSession>>
+
+    @Query("SELECT * FROM tbl_fishing_session WHERE isActive = 1")
+    fun getActiveFishingSession() : Flow<FishingSession>
 }

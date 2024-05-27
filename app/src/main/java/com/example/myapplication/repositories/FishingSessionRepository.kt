@@ -14,4 +14,8 @@ class FishingSessionRepository(private val database: FishingLicense) : IFishingS
     override suspend fun getFishingSessionsOrderedByDate(): Flow<List<FishingSession>> {
         return dao.getFishingSessionsOrderedByDate()
     }
+
+    override suspend fun getActiveSession(): Flow<FishingSession> {
+        return dao.getActiveFishingSession()
+    }
 }

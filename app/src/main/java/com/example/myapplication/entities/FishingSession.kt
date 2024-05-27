@@ -10,5 +10,5 @@ data class FishingSession(
     val areaId: Int,
     val date: Long,
     var isActive: Boolean,
-    val catchId: Int?
+    var catchId: Int?
 )

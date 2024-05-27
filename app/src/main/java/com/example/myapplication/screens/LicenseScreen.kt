@@ -71,7 +71,7 @@ fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectAre
             FishingSessionsSection(fishingSessions, viewModel, mapForCatches, mapForAreas)
         }
 
-        ActionButtons(LocalContext.current, fishingSessions, navigateToSelectArea, navigateToFish)
+        ActionButtons(LocalContext.current, fishingSessions, navigateToSelectArea, navigateToFish, viewModel, mapForAreas)
     }
 }
 
@@ -162,7 +162,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: Li
                     text = if (session.isActive) {
                         ""
                     } else {
-                        val fishType: MutableStateFlow<FishType?> = MutableStateFlow(null)
+                        /*val fishType: MutableStateFlow<FishType?> = MutableStateFlow(null)
                         val realFishType = fishType.asStateFlow().value
                         mapForCatches[session.id]?.fishTypeId?.let { viewModel.viewModelScope.launch {
                             mapForCatches[session.id]?.let { it1 ->
@@ -170,7 +170,8 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: Li
                                 }
                             }
                         }}
-                        realFishType?.type ?: "---"
+                        realFishType?.type ?: "---"*/
+                           ""
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
@@ -209,19 +210,13 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: Li
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, navigateToSelectArea: () -> Unit, navigateToFish: () -> Unit, viewModel: LicenseViewModel = viewModel()) {
+fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, navigateToSelectArea: () -> Unit, navigateToFish: () -> Unit, viewModel: LicenseViewModel, mapForAreas: Map<Int, Area>) {
     val buttonEnabled = remember { mutableStateOf(false) }
-
     val activeSession = fishingSessions?.firstOrNull { it.isActive }
     if (activeSession != null) {
-        val area: MutableStateFlow<Area?> = MutableStateFlow(null)
-        val realArea = area.asStateFlow().value
-        activeSession.areaId.let { viewModel.viewModelScope.launch {
-            viewModel.getArea(activeSession.areaId).collect{
-                    collectedArea -> area.update { collectedArea }
-            }}}
-        buttonEnabled.value = realArea?.chap == true
+        buttonEnabled.value = mapForAreas[activeSession.id]?.chap == false
     }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()

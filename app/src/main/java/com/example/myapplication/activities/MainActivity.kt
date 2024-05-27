@@ -17,6 +17,7 @@ import com.example.myapplication.daos.IFishTypeDao
 import com.example.myapplication.database.FishingLicense
 import com.example.myapplication.entities.Area
 import com.example.myapplication.entities.FishType
+import com.example.myapplication.screens.FishScreen
 import com.example.myapplication.screens.LicenseScreen
 import com.example.myapplication.screens.SelectAreaManuallyScreen
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                                     navigateToFish = { navController.navigate(FishObject) })
                         }
                         composable<FishObject> {
-                            //FishScreen()
+                            FishScreen(navigateToLicense = {navController.navigate(LicenseObject)})
                         }
                         composable<SelectAreaManuallyObject> {
                             SelectAreaManuallyScreen(navigateToLicense = { navController.navigate(LicenseObject) })

@@ -25,7 +25,6 @@ class LicenseViewModel : ViewModel(), KoinComponent {
     private val catchRepository: ICatchRepository by inject()
     private val areaRepository: IAreaRepository by inject()
     private val fishTypeRepository: IFishTypeRepository by inject()
-    private val _state = MutableStateFlow(FishingSessionState())
     private val _fishingSessions: MutableStateFlow<List<FishingSession>> = MutableStateFlow(emptyList())
     private val _mapAreasToSessions: MutableStateFlow<Map<Int, Area>> = MutableStateFlow(emptyMap())
     private val _mapCatchesToSessions: MutableStateFlow<Map<Int, Catch>> = MutableStateFlow(emptyMap())
@@ -38,8 +37,8 @@ class LicenseViewModel : ViewModel(), KoinComponent {
             sessionRepository.getFishingSessionsOrderedByDate().collect {
                 sessions -> _fishingSessions.update { sessions }
                 sessions.forEach {
-                    LoadMapForAreas(it)
-                    LoadMapForCatches(it)
+                    loadMapForAreas(it)
+                    loadMapForCatches(it)
                 }
             }
         }
@@ -55,19 +54,11 @@ class LicenseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun getCatch(id: Int): Flow<Catch> {
-        return catchRepository.getCatchById(id)
-    }
-
     suspend fun getFishType(id: Int): Flow<FishType> {
         return fishTypeRepository.getFishTypeById(id)
     }
 
-    suspend fun getArea(id: Int): Flow<Area> {
-        return areaRepository.getAreaById(id)
-    }
-
-    private suspend fun LoadMapForCatches(session: FishingSession) {
+    private suspend fun loadMapForCatches(session: FishingSession) {
         viewModelScope.launch {
             session.catchId?.let {
                 catchRepository.getCatchById(it).collect { catch ->
@@ -81,7 +72,7 @@ class LicenseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private suspend fun LoadMapForAreas(session: FishingSession) {
+    private suspend fun loadMapForAreas(session: FishingSession) {
         viewModelScope.launch {
             areaRepository.getAreaById(session.areaId).collect { area ->
                 _mapAreasToSessions.update { map ->
