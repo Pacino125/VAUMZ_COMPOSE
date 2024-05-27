@@ -14,4 +14,7 @@ interface ICatchDao {
 
     @Query("SELECT * FROM tbl_catch WHERE id = :catchId")
     fun getCatchById(catchId: Int) : Flow<Catch>
+
+    @Query("SELECT MAX(id) FROM tbl_catch")
+    fun getHighestId() : Flow<Int>
 }

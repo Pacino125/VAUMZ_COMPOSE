@@ -14,4 +14,8 @@ class CatchRepository(private val database: FishingLicense) : ICatchRepository {
     override suspend fun getCatchById(id: Int): Flow<Catch> {
         return dao.getCatchById(id)
     }
+
+    override fun getHighestId(): Flow<Int> {
+        return dao.getHighestId()
+    }
 }

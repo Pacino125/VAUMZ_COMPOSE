@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface ICatchRepository {
     suspend fun insertCatch(catch: Catch)
     suspend fun getCatchById(id: Int) : Flow<Catch>
+    fun getHighestId() : Flow<Int>
 }

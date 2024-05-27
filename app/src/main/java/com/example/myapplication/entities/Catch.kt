@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tbl_catch")
 data class Catch (
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    var id: Int = 0,
     val fishTypeId : Int,
     val fishCount : Int,
     val length : Int?,

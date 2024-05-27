@@ -1,7 +1,5 @@
 package com.example.myapplication.screens
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,17 +31,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
-import com.example.myapplication.activities.LicenseActivity
-import com.example.myapplication.data.Catch
-import com.example.myapplication.data.FishType
-import com.example.myapplication.database.FishingLicenseDbContext
-import java.util.UUID
+import com.example.myapplication.entities.Catch
+import com.example.myapplication.entities.FishType
+import com.example.myapplication.viewModels.CatchViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid: String?) {
-    val selectedFishTypeId = rememberSaveable { mutableStateOf(fishTypes[0].guid) }
-    val selectedFishType = remember { mutableStateOf(fishTypes.find { it.guid == selectedFishTypeId.value } ?: fishTypes[0]) }
+fun FishScreen(viewModel: CatchViewModel = viewModel(), navigateToLicense: () -> Unit) {
+    val defaultFishType = FishType(type = stringResource(R.string.select_fish), id = 0, maxCatchLength = null, minCatchLength = null)
+    val fishTypes by viewModel.fishTypes.collectAsState()
+    val selectedFishTypeId = rememberSaveable { mutableIntStateOf(0) }
+    val selectedFishType = remember { mutableStateOf(fishTypes.find { it.id == selectedFishTypeId.intValue } ?: defaultFishType) }
     val expanded = rememberSaveable { mutableStateOf(false) }
     val countValue = rememberSaveable { mutableStateOf("") }
     val lengthValue = rememberSaveable { mutableStateOf("") }
@@ -81,14 +85,14 @@ fun FishScreen(fishTypes: List<FishType>, context: Context, fishingSessionGuid: 
             label = stringResource(R.string.fish_weight)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        FishButtons(context, fishingSessionGuid, selectedFishType.value, countValue.value, lengthValue.value, weightValue.value)
+        FishButtons(viewModel, navigateToLicense, selectedFishType.value, countValue.value, lengthValue.value, weightValue.value)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FishDropdown(
-    selectedFishTypeId: MutableState<String>,
+    selectedFishTypeId: MutableState<Int>,
     selectedFishType: MutableState<FishType>,
     selectedCount: MutableState<String>,
     selectedLength: MutableState<String>,
@@ -118,9 +122,8 @@ fun FishDropdown(
                 fishTypes.forEach { fishType ->
                     DropdownMenuItem(
                         text = { Text(text = fishType.type) },
-                        //reset all values in textfields after selecting another type of fish
                         onClick = {
-                            selectedFishTypeId.value = fishType.guid
+                            selectedFishTypeId.value = fishType.id
                             selectedFishType.value = fishType
                             selectedCount.value = ""
                             selectedLength.value = ""
@@ -155,8 +158,8 @@ fun FishTextField(
 
 @Composable
 fun FishButtons(
-    context: Context,
-    fishingSessionGuid: String?,
+    viewModel: CatchViewModel,
+    navigateToLicense: () -> Unit,
     selectedFishType: FishType,
     countValue: String,
     lengthValue: String,
@@ -168,24 +171,31 @@ fun FishButtons(
     ) {
         FishButton(
             onClick = {
-                val intent = Intent(context, LicenseActivity::class.java)
-                context.startActivity(intent)
+                navigateToLicense()
             },
             text = stringResource(R.string.fish_cancel),
             shouldBeEnabled = true
         )
         FishButton(
             onClick = {
-                //Create new catch in tbl_catch and assign him to current fishing session.
-                //End current fishing session.
+
                 val catch = createCatch(selectedFishType, countValue, lengthValue, weightValue)
-                FishingLicenseDbContext(context).addCatch(catch, fishingSessionGuid!!)
-                val intent = Intent(context, LicenseActivity::class.java)
-                context.startActivity(intent)
+                viewModel.viewModelScope.launch {
+                    viewModel.getHighestId().collect {
+                        catch.id = it + 1
+                        viewModel.insertNewCatch(catch)
+                        viewModel.getActiveSession().collect { session ->
+                            val copy = session.copy()
+                            copy.isActive = false
+                            copy.catchId = catch.id
+                            viewModel.updateCurrentSession(copy)
+                        }
+                    }
+                }
+
+                navigateToLicense()
             },
             text = stringResource(R.string.fish_add_to_license),
-            //If type of fish is white fish or other, then you need to have values in count and weight
-            //When you have other types, you need to have values in length and weight
             shouldBeEnabled =
             if (((selectedFishType.type == stringResource(R.string.fish_white_fish)
                         || selectedFishType.type == stringResource(R.string.fish_another_type))
@@ -193,7 +203,10 @@ fun FishButtons(
                 true
             } else if (lengthValue.toIntOrNull() != null && weightValue.toDoubleOrNull() != null) {
                 true
-            } else {
+            } else if (selectedFishType.type == stringResource(R.string.select_fish)) {
+                false
+            }
+            else {
                 false
             }
         )
@@ -215,10 +228,9 @@ fun FishButton(onClick: () -> Unit, text: String, shouldBeEnabled: Boolean) {
 
 fun createCatch(selectedFishType: FishType, countValue: String, lengthValue: String, weightValue: String): Catch {
     return Catch(
-        UUID.randomUUID().toString(),
-        selectedFishType,
-        countValue.toIntOrNull() ?: 1,
-        lengthValue.toIntOrNull(),
-        weightValue.toDoubleOrNull() ?: 0.0
+        fishTypeId = selectedFishType.id,
+        fishCount = countValue.toIntOrNull() ?: 1,
+        length = lengthValue.toIntOrNull(),
+        weight = weightValue.toDoubleOrNull() ?: 0.0
     )
 }
