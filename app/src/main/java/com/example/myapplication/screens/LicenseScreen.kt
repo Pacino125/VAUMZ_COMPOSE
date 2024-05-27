@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
 import com.example.myapplication.entities.Area
@@ -39,10 +38,6 @@ import com.example.myapplication.entities.FishType
 import com.example.myapplication.entities.FishingSession
 import com.example.myapplication.events.FishingSessionEvent
 import com.example.myapplication.viewModels.LicenseViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -51,6 +46,8 @@ fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectAre
     val fishingSessions by viewModel.fishingSessions.collectAsState()
     val mapForCatches by viewModel.mapCatchesToSessions.collectAsState()
     val mapForAreas by viewModel.mapAreasToSessions.collectAsState()
+    val mapCatchesToFishTypes by viewModel.mapCatchesToFishTypes.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +65,7 @@ fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectAre
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            FishingSessionsSection(fishingSessions, viewModel, mapForCatches, mapForAreas)
+            FishingSessionsSection(fishingSessions, mapForCatches, mapForAreas, mapCatchesToFishTypes)
         }
 
         ActionButtons(LocalContext.current, fishingSessions, navigateToSelectArea, navigateToFish, viewModel, mapForAreas)
@@ -78,7 +75,7 @@ fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectAre
 @SuppressLint("StateFlowValueCalledInComposition", "SimpleDateFormat")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: LicenseViewModel, mapForCatches: Map<Int, Catch>, mapForAreas: Map<Int, Area>) {
+fun FishingSessionsSection(fishingSessions: List<FishingSession>?, mapForCatches: Map<Int, Catch>, mapForAreas: Map<Int, Area>, mapForFishTypes: Map<Int, FishType>) {
 
     if (fishingSessions == null) return
     val scrollState = rememberScrollState()
@@ -162,16 +159,8 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: Li
                     text = if (session.isActive) {
                         ""
                     } else {
-                        /*val fishType: MutableStateFlow<FishType?> = MutableStateFlow(null)
-                        val realFishType = fishType.asStateFlow().value
-                        mapForCatches[session.id]?.fishTypeId?.let { viewModel.viewModelScope.launch {
-                            mapForCatches[session.id]?.let { it1 ->
-                                viewModel.getFishType(it1.fishTypeId).collect{ collectedFishType -> fishType.update { collectedFishType }
-                                }
-                            }
-                        }}
-                        realFishType?.type ?: "---"*/
-                           ""
+                        val catchId = mapForCatches[session.id]
+                        mapForFishTypes[catchId?.fishTypeId]?.type ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)

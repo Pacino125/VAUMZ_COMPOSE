@@ -49,4 +49,5 @@
     <string name="fish_white_fish">Belička</string>
     <string name="fish_cancel">Zrušiť</string>
     <string name="fish_add_to_license">Privlastniť</string>
+    <string name="select_fish">Vyberte rybu</string>
 </resources>

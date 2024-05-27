@@ -14,11 +14,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun SelectAreaManuallyScreen(viewModel: AreaViewModel = viewModel(), navigateToLicense: () -> Unit) {
     val areas by viewModel.areas.collectAsState()
+    val searchText = rememberSaveable { mutableStateOf("") }
+    var filteredAreas = areas
+    if (searchText.value.isNotEmpty()) {
+        filteredAreas = (areas.filter { it.name.contains(searchText.value, ignoreCase = true) })
+    }
+
     val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
     val scrollState = rememberScrollState()
 
@@ -56,12 +64,12 @@ fun SelectAreaManuallyScreen(viewModel: AreaViewModel = viewModel(), navigateToL
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-
+            SearchBar(searchText.value, onSearchTextChanged = { searchText.value = it })
             Text(
                 text = stringResource(R.string.state_areas_text),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Table(areas, selectedAreaIndex, navigateToLicense= navigateToLicense)
+            Table(filteredAreas, selectedAreaIndex, navigateToLicense= navigateToLicense)
         }
     }
 }
@@ -147,4 +155,18 @@ fun TableRow(
             modifier = Modifier.weight(0.5f)
         )
     }
+}
+
+@Composable
+fun SearchBar(
+    searchText: String,
+    onSearchTextChanged: (String) -> Unit
+) {
+    TextField(
+        value = searchText,
+        onValueChange = onSearchTextChanged,
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("Vyhľadajte revír") },
+        singleLine = true
+    )
 }

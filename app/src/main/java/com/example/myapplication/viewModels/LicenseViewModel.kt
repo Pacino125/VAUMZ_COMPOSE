@@ -11,8 +11,6 @@ import com.example.myapplication.repositories.IAreaRepository
 import com.example.myapplication.repositories.ICatchRepository
 import com.example.myapplication.repositories.IFishTypeRepository
 import com.example.myapplication.repositories.IFishingSessionRepository
-import com.example.myapplication.states.FishingSessionState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -28,9 +26,11 @@ class LicenseViewModel : ViewModel(), KoinComponent {
     private val _fishingSessions: MutableStateFlow<List<FishingSession>> = MutableStateFlow(emptyList())
     private val _mapAreasToSessions: MutableStateFlow<Map<Int, Area>> = MutableStateFlow(emptyMap())
     private val _mapCatchesToSessions: MutableStateFlow<Map<Int, Catch>> = MutableStateFlow(emptyMap())
+    private val _mapCatchesToFishTypes: MutableStateFlow<Map<Int, FishType>> = MutableStateFlow(emptyMap())
     val fishingSessions = _fishingSessions.asStateFlow()
     val mapAreasToSessions = _mapAreasToSessions.asStateFlow()
     val mapCatchesToSessions = _mapCatchesToSessions.asStateFlow()
+    val mapCatchesToFishTypes = _mapCatchesToFishTypes.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -54,10 +54,6 @@ class LicenseViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    suspend fun getFishType(id: Int): Flow<FishType> {
-        return fishTypeRepository.getFishTypeById(id)
-    }
-
     private suspend fun loadMapForCatches(session: FishingSession) {
         viewModelScope.launch {
             session.catchId?.let {
@@ -79,6 +75,20 @@ class LicenseViewModel : ViewModel(), KoinComponent {
                     val helperMap = map.toMutableMap()
                     helperMap[session.id] = area
                     helperMap
+                }
+            }
+        }
+    }
+
+    suspend fun loadMapForFishTypes() {
+        viewModelScope.launch {
+            mapCatchesToSessions.value.forEach {
+                fishTypeRepository.getFishTypeById(it.value.fishTypeId).collect {fishType ->
+                    _mapCatchesToFishTypes.update { map ->
+                        val helperMap = map.toMutableMap()
+                        helperMap[it.value.id] = fishType
+                        helperMap
+                    }
                 }
             }
         }
