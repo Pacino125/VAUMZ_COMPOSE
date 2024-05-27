@@ -14,4 +14,7 @@ interface IFishTypeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(fishTypes: List<FishType>)
+
+    @Query("SELECT * FROM tbl_fish_type WHERE id = :fishTypeId")
+    fun getFishTypeById(fishTypeId: Int) : Flow<FishType>
 }

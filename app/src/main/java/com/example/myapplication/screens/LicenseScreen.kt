@@ -1,8 +1,8 @@
 package com.example.myapplication.screens
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -18,6 +18,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,16 +30,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
-import com.example.myapplication.activities.FishActivity
-import com.example.myapplication.activities.SelectAreaManuallyActivity
-import com.example.myapplication.data.FishingSession
-import com.example.myapplication.database.FishingLicenseDbContext
-import java.time.format.DateTimeFormatter
+import com.example.myapplication.entities.Area
+import com.example.myapplication.entities.Catch
+import com.example.myapplication.entities.FishType
+import com.example.myapplication.entities.FishingSession
+import com.example.myapplication.events.FishingSessionEvent
+import com.example.myapplication.viewModels.LicenseViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LicenseScreen(fishingSessions: List<FishingSession>?) {
+fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectArea: () -> Unit, navigateToFish: () -> Unit) {
+    val fishingSessions by viewModel.fishingSessions.collectAsState()
+    val mapForCatches by viewModel.mapCatchesToSessions.collectAsState()
+    val mapForAreas by viewModel.mapAreasToSessions.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,16 +68,18 @@ fun LicenseScreen(fishingSessions: List<FishingSession>?) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            FishingSessionsSection(fishingSessions)
+            FishingSessionsSection(fishingSessions, viewModel, mapForCatches, mapForAreas)
         }
 
-        ActionButtons(LocalContext.current, fishingSessions)
+        ActionButtons(LocalContext.current, fishingSessions, navigateToSelectArea, navigateToFish)
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition", "SimpleDateFormat")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
+fun FishingSessionsSection(fishingSessions: List<FishingSession>?, viewModel: LicenseViewModel, mapForCatches: Map<Int, Catch>, mapForAreas: Map<Int, Area>) {
+
     if (fishingSessions == null) return
     val scrollState = rememberScrollState()
 
@@ -71,7 +88,6 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
             .padding(horizontal = 16.dp)
             .then(Modifier.verticalScroll(scrollState))
     ) {
-        //Header
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -119,35 +135,42 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
             )
         }
 
-        //values under header
         fishingSessions.forEach { session ->
+            val formattedDate = SimpleDateFormat("dd.MM").format(session.date)
+
             Row(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .background(if (session.isActive) Color.Gray else Color.Transparent)
             ) {
                 Text(
-                    text = session.date.format(DateTimeFormatter.ofPattern("dd.MM")),
+                    text = formattedDate,
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = session.areaId.areaId,
+                    text = mapForAreas[session.id]?.areaId ?: "",
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
-                    text = session.areaId.name,
+                    text = mapForAreas[session.id]?.name ?: "",
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
                 )
-                // If you have active fishing session, then do not display values within catch columns
-                // If fishing session is not active and catch doesn't have value, display ---
                 Text(
                     text = if (session.isActive) {
                         ""
                     } else {
-                        session.catchId?.fishType?.type ?: "---"
+                        val fishType: MutableStateFlow<FishType?> = MutableStateFlow(null)
+                        val realFishType = fishType.asStateFlow().value
+                        mapForCatches[session.id]?.fishTypeId?.let { viewModel.viewModelScope.launch {
+                            mapForCatches[session.id]?.let { it1 ->
+                                viewModel.getFishType(it1.fishTypeId).collect{ collectedFishType -> fishType.update { collectedFishType }
+                                }
+                            }
+                        }}
+                        realFishType?.type ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
@@ -156,7 +179,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
                     text = if (session.isActive) {
                         ""
                     } else {
-                        session.catchId?.fishCount?.toString() ?: "---"
+                        mapForCatches[session.id]?.fishCount?.toString() ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
@@ -165,7 +188,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
                     text = if (session.isActive) {
                         ""
                     } else {
-                        session.catchId?.length?.toString() ?: "---"
+                        mapForCatches[session.id]?.length?.toString() ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
@@ -174,7 +197,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
                     text = if (session.isActive) {
                         ""
                     } else {
-                        session.catchId?.weight?.toString() ?: "---"
+                        mapForCatches[session.id]?.weight?.toString() ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
@@ -184,8 +207,21 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?) {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
+fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?, navigateToSelectArea: () -> Unit, navigateToFish: () -> Unit, viewModel: LicenseViewModel = viewModel()) {
+    val buttonEnabled = remember { mutableStateOf(false) }
+
+    val activeSession = fishingSessions?.firstOrNull { it.isActive }
+    if (activeSession != null) {
+        val area: MutableStateFlow<Area?> = MutableStateFlow(null)
+        val realArea = area.asStateFlow().value
+        activeSession.areaId.let { viewModel.viewModelScope.launch {
+            viewModel.getArea(activeSession.areaId).collect{
+                    collectedArea -> area.update { collectedArea }
+            }}}
+        buttonEnabled.value = realArea?.chap == true
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -196,31 +232,25 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            //Button is disabled, when you don't have active fishing session
-            // or when you have active session in area, which is chap (catch and release)
             Button(
                 onClick = {
-                    val intent = Intent(context, FishActivity::class.java)
-                    intent.putExtra("FISHING_SESSION_GUID", fishingSessions!!.first { it.isActive }.guid)
-                    context.startActivity(intent)
+                    navigateToFish()
                 },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .height(48.dp),
-                enabled = fishingSessions?.any { it.isActive  && it.areaId.chap == false } ?: false
+                enabled = buttonEnabled.value
             ) {
                 Text(text = stringResource(R.string.license_add_fish))
             }
 
-            //If you have active fishing session, then display button for ending it
-            // Otherwise display start fishing session button
             if (fishingSessions != null && fishingSessions.any { it.isActive }) {
                 Button(
                     onClick = {
-                        val activeSession = fishingSessions.firstOrNull { it.isActive }
                         activeSession?.let {
-                            FishingLicenseDbContext(context).updateFishingSessionIsActiveToFalse(it.guid)
+                            activeSession.isActive = false
+                            viewModel.onEvent(FishingSessionEvent.UpsertFishingSession(activeSession))
                         }
                         (context as? Activity)?.recreate()
                     },
@@ -234,8 +264,7 @@ fun ActionButtons(context: Context, fishingSessions: List<FishingSession>?) {
             } else {
                 Button(
                     onClick = {
-                        val intent = Intent(context, SelectAreaManuallyActivity::class.java)
-                        context.startActivity(intent)
+                        navigateToSelectArea()
                     },
                     modifier = Modifier
                         .weight(1f)

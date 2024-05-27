@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface IFishTypeRepository {
     suspend fun getFishTypes() : Flow<List<FishType>>
+    suspend fun getFishTypeById(id: Int) : Flow<FishType>
 }

@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             //FishScreen()
                         }
                         composable<SelectAreaManuallyObject> {
-                            SelectAreaManuallyScreen()
+                            SelectAreaManuallyScreen(navigateToLicense = { navController.navigate(LicenseObject) })
                         }
                     }
                 }
@@ -60,11 +60,11 @@ class MainActivity : ComponentActivity() {
             FishingLicense::class.java, "fishing_license"
         ).build()
 
-        fishTypeDao = db.fishTypeDao()
+        /*fishTypeDao = db.fishTypeDao()
         insertFishType()
 
         areaDao = db.areaDao()
-        insertInitialAreas()
+        insertInitialAreas()*/
     }
 
     private fun insertFishType() {

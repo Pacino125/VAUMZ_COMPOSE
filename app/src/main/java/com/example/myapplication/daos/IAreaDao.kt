@@ -14,4 +14,7 @@ interface IAreaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(areas: List<Area>)
+
+    @Query("SELECT * FROM tbl_area WHERE id = :areaId")
+    fun getAreaById(areaId: Int) : Flow<Area>
 }

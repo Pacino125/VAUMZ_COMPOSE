@@ -1,6 +1,5 @@
 package com.example.myapplication.screens
 
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -17,26 +16,29 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.R
-import com.example.myapplication.data.Area
-import com.example.myapplication.data.FishingSession
-import com.example.myapplication.events.AreaEvent
-import com.example.myapplication.states.AreaState
-import java.time.LocalDateTime
+import com.example.myapplication.entities.Area
+import com.example.myapplication.entities.FishingSession
+import com.example.myapplication.viewModels.AreaViewModel
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SelectAreaManuallyScreen(state: AreaState, onEvent: (AreaEvent) -> Unit) {
+fun SelectAreaManuallyScreen(viewModel: AreaViewModel = viewModel(), navigateToLicense: () -> Unit) {
+    val areas by viewModel.areas.collectAsState()
     val selectedAreaIndex = rememberSaveable { mutableIntStateOf(-1) }
     val scrollState = rememberScrollState()
 
@@ -59,14 +61,14 @@ fun SelectAreaManuallyScreen(state: AreaState, onEvent: (AreaEvent) -> Unit) {
                 text = stringResource(R.string.state_areas_text),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Table(state.areas, selectedAreaIndex, LocalContext.current)
+            Table(areas, selectedAreaIndex, navigateToLicense= navigateToLicense)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, context: Context) {
+fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, viewModel: AreaViewModel = viewModel(), navigateToLicense: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.background
@@ -92,15 +94,17 @@ fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, context: Con
                     } else {
                         val selectedArea = areas[selectedAreaIndex.value]
                         val session = FishingSession(
-                            areaId = selectedArea,
-                            date = LocalDateTime.now(),
+                            areaId = selectedArea.id,
+                            date = System.currentTimeMillis(),
                             isActive = true,
                             catchId = null
                         )
 
-                        /*dbHelper.insertFishingSession(session, selectedArea.guid)
-                        val intent = Intent(context, LicenseActivity::class.java)
-                        context.startActivity(intent)*/
+                        viewModel.viewModelScope.launch {
+                            viewModel.insertNewFishingSession(session)
+                        }
+
+                        navigateToLicense()
                     }
                 }
             }

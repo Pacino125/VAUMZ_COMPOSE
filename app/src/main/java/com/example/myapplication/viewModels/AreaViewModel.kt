@@ -3,22 +3,28 @@ package com.example.myapplication.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.entities.Area
+import com.example.myapplication.entities.FishingSession
 import com.example.myapplication.events.AreaEvent
 import com.example.myapplication.repositories.IAreaRepository
+import com.example.myapplication.repositories.IFishingSessionRepository
 import com.example.myapplication.states.AreaState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AreaViewModel(private val repository : IAreaRepository) : ViewModel() {
+class AreaViewModel : ViewModel(), KoinComponent {
+    private val areaRepository: IAreaRepository by inject()
+    private val sessionRepository: IFishingSessionRepository by inject()
     private val _state = MutableStateFlow(AreaState())
     private val _areas: MutableStateFlow<List<Area>> = MutableStateFlow(emptyList())
     val areas = _areas.asStateFlow()
 
     init {
         viewModelScope.launch {
-            repository.getAreasOrderedByName().collect {
+            areaRepository.getAreasOrderedByName().collect {
                     areas -> _areas.update { areas }
             }
         }
@@ -32,5 +38,9 @@ class AreaViewModel(private val repository : IAreaRepository) : ViewModel() {
                 }
             }
         }
+    }
+
+    suspend fun insertNewFishingSession(fishingSession: FishingSession) {
+        sessionRepository.upsertFishingSession(fishingSession)
     }
 }

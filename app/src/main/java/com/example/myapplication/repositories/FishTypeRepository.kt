@@ -10,4 +10,8 @@ class FishTypeRepository(private val database: FishingLicense) : IFishTypeReposi
     override suspend fun getFishTypes() : Flow<List<FishType>> {
         return dao.getFishTypes()
     }
+
+    override suspend fun getFishTypeById(id: Int): Flow<FishType> {
+        return dao.getFishTypeById(id)
+    }
 }

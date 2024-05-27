@@ -10,4 +10,8 @@ class AreaRepository(private val database: FishingLicense) : IAreaRepository {
     override suspend fun getAreasOrderedByName() : Flow<List<Area>> {
         return dao.getAreasOrderedByName()
     }
+
+    override suspend fun getAreaById(id: Int): Flow<Area> {
+        return dao.getAreaById(id)
+    }
 }
