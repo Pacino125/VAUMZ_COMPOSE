@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.entities.Area
 import com.example.myapplication.entities.FishingSession
-import com.example.myapplication.events.AreaEvent
 import com.example.myapplication.repositories.IAreaRepository
 import com.example.myapplication.repositories.IFishingSessionRepository
-import com.example.myapplication.states.AreaState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +16,6 @@ import org.koin.core.component.inject
 class AreaViewModel : ViewModel(), KoinComponent {
     private val areaRepository: IAreaRepository by inject()
     private val sessionRepository: IFishingSessionRepository by inject()
-    private val _state = MutableStateFlow(AreaState())
     private val _areas: MutableStateFlow<List<Area>> = MutableStateFlow(emptyList())
     val areas = _areas.asStateFlow()
 
@@ -26,16 +23,6 @@ class AreaViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             areaRepository.getAreasOrderedByName().collect {
                     areas -> _areas.update { areas }
-            }
-        }
-    }
-
-    fun onEvent(event: AreaEvent) {
-        when(event) {
-            is AreaEvent.SetSelectedAreaIndex -> {
-                _state.update {
-                    it.copy(selectedAreaIndex = event.index)
-                }
             }
         }
     }
