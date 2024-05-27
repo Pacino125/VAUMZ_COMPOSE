@@ -5,14 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.events.CatchEvent
 import com.example.myapplication.repositories.ICatchRepository
 import com.example.myapplication.states.CatchState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CatchViewModel @Inject constructor(private val repository: ICatchRepository): ViewModel() {
+class CatchViewModel(private val repository: ICatchRepository): ViewModel() {
     private val _state = MutableStateFlow(CatchState())
 
     fun onEvent(event: CatchEvent) {

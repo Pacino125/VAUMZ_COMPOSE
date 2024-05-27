@@ -3,7 +3,7 @@ plugins {
     id("kotlin-android")
     id("com.google.relay") version "0.3.12"
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -55,11 +55,14 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt ("androidx.room:room-compiler:2.6.1")
+    implementation ("androidx.room:room-runtime:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    kapt("androidx.hilt:hilt-compiler:1.2.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation("io.insert-koin:koin-android:3.4.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.4.4")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -72,10 +75,4 @@ dependencies {
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    kapt("com.example.myapplication.module.AppModule")
-}
-
-kapt {
-    correctErrorTypes = true
 }
