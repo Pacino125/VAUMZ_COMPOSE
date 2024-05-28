@@ -1,20 +1,29 @@
 package com.example.myapplication.screens
 
 import android.os.Build
+import androidx.compose.ui.draw.clip
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -54,7 +63,7 @@ fun SelectAreaManuallyScreen(viewModel: AreaViewModel = viewModel(), navigateToL
         modifier = Modifier.verticalScroll(scrollState)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).background(color = MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -76,7 +85,12 @@ fun SelectAreaManuallyScreen(viewModel: AreaViewModel = viewModel(), navigateToL
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, viewModel: AreaViewModel = viewModel(), navigateToLicense: () -> Unit) {
+fun Table(
+    areas: List<Area>?,
+    selectedAreaIndex: MutableState<Int>,
+    viewModel: AreaViewModel = viewModel(),
+    navigateToLicense: () -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.background
@@ -87,6 +101,11 @@ fun Table(areas: List<Area>?, selectedAreaIndex: MutableState<Int>, viewModel: A
                 areaName = stringResource(R.string.select_area_area_name),
                 areaId = stringResource(R.string.select_area_area_number),
                 chap = stringResource(R.string.select_area_area_chap)
+            )
+
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Color.LightGray
             )
 
             areas?.forEachIndexed { index, area ->
@@ -130,7 +149,7 @@ fun TableRow(
     onClick: () -> Unit = {}
 ) {
     Row(
-        modifier = Modifier
+        Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .run {
@@ -142,6 +161,12 @@ fun TableRow(
             }
             .background(if (selected) Color.Gray else Color.Transparent)
     ) {
+        var background = Color(0xFF006400)
+        if (chap == "Áno") {
+            background = Color.Red
+        } else if (header) {
+            background = Color.Transparent
+        }
         Text(
             text = areaName,
             modifier = Modifier.weight(1.5f)
@@ -150,13 +175,23 @@ fun TableRow(
             text = areaId,
             modifier = Modifier.weight(1f)
         )
-        Text(
-            text = chap,
-            modifier = Modifier.weight(0.5f)
-        )
+        Box(
+            modifier = Modifier
+                .weight(0.5f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(background)
+                .padding(8.dp)
+        ) {
+            Text(
+                text = chap,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     searchText: String,
@@ -165,8 +200,25 @@ fun SearchBar(
     TextField(
         value = searchText,
         onValueChange = onSearchTextChanged,
-        modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Vyhľadajte revír") },
-        singleLine = true
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp)),
+        placeholder = { Text(stringResource(R.string.find_area), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)) },
+        singleLine = true,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search Icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+        ),
+        shape = RoundedCornerShape(8.dp)
     )
 }
