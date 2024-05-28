@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface IFishTypeDao {
-    @Query("SELECT * FROM tbl_fish_type")
+    @Query("SELECT * FROM tbl_fish_type ORDER BY type ASC")
     fun getFishTypes() : Flow<List<FishType>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

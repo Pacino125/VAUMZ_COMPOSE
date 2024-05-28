@@ -15,8 +15,11 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -38,6 +41,9 @@ import com.example.myapplication.entities.Catch
 import com.example.myapplication.entities.FishType
 import com.example.myapplication.viewModels.CatchViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun FishScreen(viewModel: CatchViewModel = viewModel(), navigateToLicense: () -> Unit) {
@@ -137,6 +143,7 @@ fun FishDropdown(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FishTextField(
     value: String,
@@ -144,7 +151,7 @@ fun FishTextField(
     label: String,
     enabled: Boolean = true
 ) {
-    TextField(
+    OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
@@ -152,7 +159,16 @@ fun FishTextField(
             keyboardType = KeyboardType.Number,
         ),
         singleLine = true,
-        enabled = enabled
+        enabled = enabled,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .height(56.dp),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = Color.White,
+            unfocusedBorderColor = Color.Gray
+        )
     )
 }
 

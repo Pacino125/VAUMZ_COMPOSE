@@ -39,6 +39,8 @@ import com.example.myapplication.entities.FishingSession
 import com.example.myapplication.events.FishingSessionEvent
 import com.example.myapplication.viewModels.LicenseViewModel
 import java.text.SimpleDateFormat
+import androidx.compose.material3.HorizontalDivider
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -56,7 +58,6 @@ fun LicenseScreen(viewModel: LicenseViewModel = viewModel(), navigateToSelectAre
     ) {
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -131,6 +132,11 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, mapForCatches
                 modifier = Modifier.weight(1f)
             )
         }
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = Color.LightGray
+        )
 
         fishingSessions.forEach { session ->
             val formattedDate = SimpleDateFormat("dd.MM").format(session.date)
