@@ -16,5 +16,5 @@ interface ICatchDao {
     fun getCatchById(catchId: Int) : Flow<Catch>
 
     @Query("SELECT MAX(id) FROM tbl_catch")
-    fun getHighestId() : Flow<Int>
+    fun getHighestId() : Flow<Int?>
 }

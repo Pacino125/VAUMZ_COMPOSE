@@ -35,7 +35,7 @@ class CatchViewModel : ViewModel(), KoinComponent {
         catchRepository.insertCatch(catch)
     }
 
-    suspend fun getHighestId(): Flow<Int> {
+    suspend fun getHighestId(): Flow<Int?> {
         return catchRepository.getHighestId()
     }
 

@@ -79,18 +79,4 @@ class LicenseViewModel : ViewModel(), KoinComponent {
             }
         }
     }
-
-    suspend fun loadMapForFishTypes() {
-        viewModelScope.launch {
-            mapCatchesToSessions.value.forEach {
-                fishTypeRepository.getFishTypeById(it.value.fishTypeId).collect {fishType ->
-                    _mapCatchesToFishTypes.update { map ->
-                        val helperMap = map.toMutableMap()
-                        helperMap[it.value.id] = fishType
-                        helperMap
-                    }
-                }
-            }
-        }
-    }
 }

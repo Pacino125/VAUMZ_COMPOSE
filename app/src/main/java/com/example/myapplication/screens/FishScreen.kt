@@ -178,11 +178,14 @@ fun FishButtons(
         )
         FishButton(
             onClick = {
-
                 val catch = createCatch(selectedFishType, countValue, lengthValue, weightValue)
                 viewModel.viewModelScope.launch {
                     viewModel.getHighestId().collect {
-                        catch.id = it + 1
+                        if (it == null) {
+                            catch.id = 0
+                        } else {
+                            catch.id = it + 1
+                        }
                         viewModel.insertNewCatch(catch)
                         viewModel.getActiveSession().collect { session ->
                             val copy = session.copy()
@@ -228,7 +231,7 @@ fun FishButton(onClick: () -> Unit, text: String, shouldBeEnabled: Boolean) {
 
 fun createCatch(selectedFishType: FishType, countValue: String, lengthValue: String, weightValue: String): Catch {
     return Catch(
-        fishTypeId = selectedFishType.id,
+        fishType = selectedFishType.type,
         fishCount = countValue.toIntOrNull() ?: 1,
         length = lengthValue.toIntOrNull(),
         weight = weightValue.toDoubleOrNull() ?: 0.0

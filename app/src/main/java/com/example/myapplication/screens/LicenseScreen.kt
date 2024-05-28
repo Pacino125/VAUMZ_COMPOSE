@@ -159,8 +159,7 @@ fun FishingSessionsSection(fishingSessions: List<FishingSession>?, mapForCatches
                     text = if (session.isActive) {
                         ""
                     } else {
-                        val catchId = mapForCatches[session.id]
-                        mapForFishTypes[catchId?.fishTypeId]?.type ?: "---"
+                        mapForCatches[session.id]?.fishType ?: "---"
                     },
                     fontSize = 12.sp,
                     modifier = Modifier.weight(1f)
