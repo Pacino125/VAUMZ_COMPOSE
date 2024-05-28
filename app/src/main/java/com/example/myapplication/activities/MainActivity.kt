@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             FishingLicense::class.java, "fishing_license"
         ).build()
 
-        /*fishTypeDao = db.fishTypeDao()
+       /* fishTypeDao = db.fishTypeDao()
         insertFishType()
 
         areaDao = db.areaDao()
